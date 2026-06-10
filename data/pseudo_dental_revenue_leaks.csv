@@ -1,0 +1,45 @@
+patient_id,claim_id,provider,payer,procedure_code_description,service_date,claim_status,total_charge,paid_amount,insurance_balance,patient_balance,total_balance,last_payment_date,last_followup_date,next_action_due,notes
+P0001,C1001,Dr. Patel,Delta Dental,D2740 Crown,2025-05-25,submitted,125,50,48,27,75,,2025-06-09,2025-12-02,Needs payer call
+P0002,C1002,Dr. Nguyen,United Concordia,D0150 Comprehensive Exam,2025-08-13,patient_due,125,50,0,75,75,2025-09-12,,2025-12-02,Patient promised payment
+P0003,C1003,Dr. Patel,United Concordia,D0210 Full Mouth X-rays,2025-10-17,denied,380,25,355,0,355,,,2025-12-08,Eligibility unclear
+P0004,C1004,Dr. Nguyen,Self-Pay,D7140 Extraction,2025-11-13,paid,175,175,0,0,0,2025-12-04,2025-11-28,,
+P0005,C1005,Dr. Patel,Guardian,D2391 Resin Composite,2025-10-27,appealed,175,100,60,15,75,2025-11-17,,2025-12-08,Eligibility unclear
+P0006,C1006,Dr. Patel,Self-Pay,D4341 Scaling/Root Planing,2025-10-27,denied,1550,25,1220,305,1525,2025-11-10,2025-11-11,,EOB missing
+P0007,C1007,Dr. Nguyen,MetLife,D7140 Extraction,2025-10-17,submitted,380,200,144,36,180,,2025-12-16,,Coding review suggested
+P0008,C1008,Dr. Nguyen,United Concordia,D2391 Resin Composite,2025-07-09,paid,1200,1200,0,0,0,2025-07-23,2025-07-24,2025-12-02,Coding review suggested
+P0009,C1009,Hygienist B,Self-Pay,D7140 Extraction,2025-09-17,patient_due,175,200,0,-25,-25,2025-10-17,2025-10-02,2025-12-02,Coding review suggested
+P0010,C1010,Dr. Smith,Self-Pay,D2740 Crown,2025-10-01,submitted,650,100,357,193,550,2025-10-22,2025-10-31,2025-12-02,Needs payer call
+P0011,C1011,Dr. Nguyen,Delta Dental,D2740 Crown,2025-10-01,appealed,240,200,20,20,40,2025-10-31,,2025-12-08,Eligibility unclear
+P0012,C1012,Dr. Smith,Guardian,D0150 Comprehensive Exam,2025-11-13,submitted,1550,0,1007,543,1550,,,2025-12-04,Needs payer call
+P0013,C1013,Dr. Nguyen,MetLife,D1110 Adult Prophylaxis,2025-08-13,appealed,380,50,330,0,330,2025-09-03,,2025-12-02,Patient promised payment
+P0014,C1014,Dr. Patel,Delta Dental,D4341 Scaling/Root Planing,2025-11-21,patient_due,2100,50,0,2050,2050,2025-11-28,,2025-12-04,
+P0015,C1015,Dr. Nguyen,Self-Pay,D0210 Full Mouth X-rays,2025-08-13,denied,650,50,480,120,600,,,2025-12-15,EOB missing
+P0016,C1016,Dr. Patel,Aetna,D4341 Scaling/Root Planing,2025-10-27,submitted,175,100,60,15,75,2025-11-26,2025-11-11,2025-12-02,
+P0017,C1017,Hygienist A,Self-Pay,D1110 Adult Prophylaxis,2025-10-27,denied,380,50,264,66,330,,,2025-12-02,
+P0018,C1018,Hygienist A,Aetna,D2740 Crown,2025-05-25,patient_due,125,0,0,125,125,,2025-06-24,,EOB missing
+P0019,C1019,Dr. Smith,Aetna,D0210 Full Mouth X-rays,2025-11-21,denied,1200,0,960,240,1200,,,2025-12-15,Needs payer call
+P0020,C1020,Hygienist A,Guardian,D2391 Resin Composite,2025-10-27,rejected,380,0,380,0,380,,2025-11-11,,
+P0021,C1021,Hygienist B,Guardian,D0120 Periodic Oral Evaluation,2025-08-13,submitted,240,0,120,120,240,,2025-09-12,2025-12-04,Eligibility unclear
+P0022,C1022,Dr. Nguyen,Cigna,D0150 Comprehensive Exam,2025-11-13,paid,2100,2100,0,0,0,,,2025-12-08,Needs payer call
+P0023,C1023,Dr. Patel,Guardian,D2740 Crown,2025-05-25,pending_insurance,650,100,440,110,550,2025-06-01,,2025-12-02,Eligibility unclear
+P0024,C1024,Hygienist B,United Concordia,D7140 Extraction,2025-10-17,denied,900,0,900,0,900,,,,Eligibility unclear
+P0025,C1025,Dr. Patel,United Concordia,D2391 Resin Composite,2025-05-25,patient_due,125,100,0,25,25,2025-06-01,2025-06-24,,Patient promised payment
+P0026,C1026,Dr. Patel,Delta Dental,D0150 Comprehensive Exam,2025-10-17,patient_due,380,100,0,280,280,,2025-12-01,2025-12-08,Patient promised payment
+P0027,C1027,Dr. Patel,Delta Dental,D2391 Resin Composite,2025-11-21,submitted,900,25,700,175,875,,,2025-12-02,Eligibility unclear
+P0028,C1028,Dr. Smith,MetLife,D2740 Crown,2025-11-21,appealed,900,200,455,245,700,2025-11-28,,2025-12-02,Coding review suggested
+P0029,C1029,Dr. Nguyen,United Concordia,D4341 Scaling/Root Planing,2025-11-13,rejected,2100,25,2075,0,2075,2025-11-27,2025-12-13,2025-12-02,EOB missing
+P0030,C1030,Hygienist A,MetLife,D2740 Crown,2025-05-25,appealed,380,50,214,116,330,2025-06-01,,,EOB missing
+P0031,C1031,Dr. Patel,Self-Pay,D7140 Extraction,2025-10-01,rejected,380,0,380,0,380,,2025-11-30,,Patient promised payment
+P0032,C1032,Dr. Smith,Delta Dental,D1110 Adult Prophylaxis,2025-05-25,patient_due,1200,100,0,1100,1100,2025-06-01,2025-07-09,,Eligibility unclear
+P0033,C1033,Hygienist B,Self-Pay,D2740 Crown,2025-09-17,rejected,900,25,875,0,875,2025-10-01,,2025-12-02,Patient promised payment
+P0034,C1034,Dr. Smith,Aetna,D7140 Extraction,2025-09-17,submitted,900,200,560,140,700,2025-09-24,2025-11-01,2025-12-15,Eligibility unclear
+P0035,C1035,Dr. Smith,Cigna,D2740 Crown,2025-11-06,denied,1200,50,920,230,1150,2025-11-20,2025-12-21,2025-12-02,EOB missing
+P0036,C1036,Hygienist B,United Concordia,D4341 Scaling/Root Planing,2025-07-09,patient_due,900,200,0,700,700,2025-07-23,2025-08-08,2025-12-08,
+P0037,C1037,Hygienist A,Aetna,D2740 Crown,2025-10-27,pending_insurance,650,25,406,219,625,,,2025-12-02,Coding review suggested
+P0038,C1038,Hygienist A,MetLife,D2391 Resin Composite,2025-09-17,paid,1200,1200,0,0,0,,2025-10-02,2025-12-02,Coding review suggested
+P0039,C1039,Hygienist A,Guardian,D0150 Comprehensive Exam,2025-08-13,paid,125,125,0,0,0,2025-08-20,2025-10-12,2025-12-08,Eligibility unclear
+P0040,C1040,Hygienist A,Delta Dental,D7140 Extraction,2025-09-04,denied,1550,25,1220,305,1525,2025-09-25,2025-11-03,2025-12-08,Needs payer call
+P9001,C9001,Dr. Patel,Delta Dental,D2740 Crown,2025-07-15,denied,1550,0,1550,0,1550,,,,Denied; no follow-up recorded
+P9002,C9002,Dr. Smith,Self-Pay,D4341 Scaling/Root Planing,2025-08-20,patient_due,900,100,0,800,800,2025-09-05,,,Old patient balance
+P9003,C9003,Dr. Nguyen,MetLife,D2391 Resin Composite,2025-09-01,pending_insurance,380,0,380,0,380,,2025-09-20,,Insurance balance aging
+P9004,C9004,Hygienist A,Guardian,D1110 Adult Prophylaxis,2025-05-10,submitted,175,0,120,55,175,,,,Very old submitted claim
