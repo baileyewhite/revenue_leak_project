@@ -31,3 +31,47 @@ def write_report_to_csv(report, category_type):
                     "Claim Status": claim_info['claim_status']
                 })
     return output_path
+
+def write_combined_report_to_csv(reports_by_category):
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+    output_path = OUTPUT_DIR / "combined_revenue_leak_report.csv"
+
+    fieldnames = [
+        "category_type",
+        "category_statement",
+        "patient_id",
+        "claim_id",
+        "service_date",
+        "days_past",
+        "patient_balance",
+        "insurance_balance",
+        "total_balance",
+        "claim_status"
+    ]
+
+    with open(output_path, "w", newline="", encoding="utf-8") as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+
+        for category_report in reports_by_category:
+            category_type = category_report["category_type"]
+            category_statement = category_report["statement"]
+            report = category_report["report"]
+
+            for patient_id, claims in report.items():
+                for claim_id, claim_info in claims.items():
+                    writer.writerow({
+                        "category_type": category_type,
+                        "category_statement": category_statement,
+                        "patient_id": patient_id,
+                        "claim_id": claim_id,
+                        "service_date": claim_info["service_date"],
+                        "days_past": claim_info["days_past"],
+                        "patient_balance": claim_info["patient_balance"],
+                        "insurance_balance": claim_info["insurance_balance"],
+                        "total_balance": claim_info["total_balance"],
+                        "claim_status": claim_info["claim_status"]
+                    })
+
+    return output_path

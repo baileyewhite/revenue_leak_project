@@ -1,11 +1,12 @@
 from config import TODAY
 from leak_categories import REPORT_CATEGORIES
-from report_writer import write_report_to_csv
+from report_writer import write_report_to_csv, write_combined_report_to_csv
 
 ### MAIN GENERATOR ###
 def generate_all_reports(data):
     reports = []
     output_paths = []
+    reports_by_category = []
 
     for category in REPORT_CATEGORIES:
         report = category["finder"](data)
@@ -19,7 +20,17 @@ def generate_all_reports(data):
         )
 
         reports.append(report)
+
+        reports_by_category.append({
+            "category_type": category["category_type"],
+            "statement": category["statement"],
+            "report": report
+        })
+
         output_paths.append(output_path)
+
+    combined_output_path = write_combined_report_to_csv(reports_by_category)
+    output_paths.append(combined_output_path)
 
     unique_claim_count, unique_total_exposure = calculate_unique_claim_exposure(reports)
 

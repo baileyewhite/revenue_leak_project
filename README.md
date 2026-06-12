@@ -8,13 +8,14 @@ The script analyzes sample patient and claim data, generates category-specific C
 
 - Reads patient and claim data from a CSV file
 - Detects revenue leaks based on multiple reporting categories
-- Generates and exports the detected results to separate CSV files for each revenue leak category
+- Generates and exports the detected results to separate CSV files for each revenue leak category and one CSV file for all combined revenue leaks
 - Prints a terminal summary with:
   - Claim counts by category
   - Total unique claims flagged
   - Total unique revenue at risk
   - List of reports created
 - Supports flexible column mapping for alternate CSV header names
+- Provides user-friendly error handling for missing files, missing columns, invalid dates, and invalid money values
 
 ## Flexible Column Mapping
 
@@ -40,6 +41,7 @@ revenue_leak_project/
   output/
     balances_over_1000.csv
     balances_overdue_past_60_days.csv
+    combined_revenue_leak_report.csv
     denied_insurance_claims.csv
     old_submitted_claims.csv
     pending_insurance_claims.csv
