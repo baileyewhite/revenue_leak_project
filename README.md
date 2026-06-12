@@ -1,6 +1,6 @@
 # Revenue Leak Detector
 
-This is a Python project that reads a dental revenue CSV file and identifies possible revenue leaks that may need follow-up.
+This is a Python project that reads synthetic dental claims data and identifies possible revenue leaks that may need follow-up.
 
 The script analyzes sample patient and claim data, generates category-specific CSV reports, and prints a business-style summary to the terminal.
 
@@ -16,6 +16,7 @@ The script analyzes sample patient and claim data, generates category-specific C
   - List of reports created
 - Supports flexible column mapping for alternate CSV header names
 - Provides user-friendly error handling for missing files, missing columns, invalid dates, and invalid money values
+- Includes automated testing for data loading, revenue leak logic, and summary calculations
 
 ## Flexible Column Mapping
 
@@ -37,7 +38,7 @@ This makes the tool more flexible for CSV files that use different naming conven
 ```text
 revenue_leak_project/
   data/
-    pseudo_dental_revenue_leaks.csv
+    sample_dental_claims.csv
   output/
     balances_over_1000.csv
     balances_overdue_past_60_days.csv
@@ -53,7 +54,13 @@ revenue_leak_project/
     main.py
     report_writer.py
     summary.py
+  tests/
+    test_data_loader.py
+    test_leak_categories.py
+    test_summary.py
+  pytest.ini
   README.md
+  requirements.txt
 ```
 
 ## How to Run
@@ -62,6 +69,24 @@ revenue_leak_project/
   python src/main.py
   ```
 - The script will print a business report summary to the terminal and create multiple category-specific CSV reports in the `output/` folder.
+
+## Running Tests
+
+This project uses `pytest` for automated testing.
+
+Install project dependencies:
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+Run the test suite from the project folder:
+
+```bash
+python -m pytest
+```
+
+The tests currently check CSV parsing, flexible column mapping, revenue leak category logic, and unique revenue exposure calculations.
 
 ## Important Notes
 - This project uses fake sample patient data for current testing. Real patient data should not be committed to Git.

@@ -18,4 +18,4 @@ output/
 data/*.csv
 
 # Test CSV Data
-!data/pseudo_dental_revenue_leaks.csv
+!data/sample_dental_claims.csv
