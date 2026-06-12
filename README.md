@@ -37,7 +37,12 @@ revenue_leak_project/
     pending_insurance_claims.csv
     unresolved_appealed_claims.csv
   src/
+    config.py
+    data_loader.py
+    leak_categories.py
     main.py
+    report_writer.py
+    summary.py
   README.md
 ```
 
