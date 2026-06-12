@@ -42,9 +42,12 @@ revenue_leak_project/
 ```
 
 ## How to Run
-- Run the script: `src/main.py`
+- From the project folder, run the script: 
+  ```bash
+  python src/main.py
 - The script will print a business report summary to the terminal and create multiple category-specific CSV reports in the `output/` folder
 
 ## Important Notes
 - This project uses fake sample patient data for current testing. Real patient data should not be committed to Git.
 - Data in the `output/` folder is generated and may not be committed to Git.
+- File paths are handled relative to the project folder, so the script does not depend on a specific user directory.

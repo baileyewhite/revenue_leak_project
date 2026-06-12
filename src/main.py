@@ -1,13 +1,17 @@
 import csv
 from datetime import date
-import os
+from pathlib import Path
 
 TODAY = date.today()
 PAST_DUE_LIMIT = 60
 MAX_LATE_BALANCE = 0
 MAX_TOTAL_BALANCE = 1000
 
-SAMPLE_FILE_PATH = "C:/Users/bayca/revenue_leak_project/data/pseudo_dental_revenue_leaks.csv"
+SAMPLE_DATA_FILE = "pseudo_dental_revenue_leaks.csv"
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+DATA_PATH = BASE_DIR / "data" / SAMPLE_DATA_FILE
+OUTPUT_DIR = BASE_DIR / "output"
 
 def read_csv_patient_data(file_path):
     # Receives a CSV file and outputs patient_data
@@ -52,10 +56,8 @@ def write_report_to_csv(report, category_type):
         "Days Since Service",
         "Claim Status"]
 
-    output_folder = "C:/Users/bayca/revenue_leak_project/output"
-    os.makedirs(output_folder, exist_ok=True)
-
-    output_path = f"{output_folder}/{category_type}.csv"
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    output_path = OUTPUT_DIR / f"{category_type}.csv"
 
     with open(output_path, 'w', newline='', encoding = "utf-8") as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=headers)
@@ -255,5 +257,5 @@ def generate_all_reports(data):
     return unique_claim_count, unique_total_exposure, output_paths
 
 if __name__ == '__main__':
-    patient_data = read_csv_patient_data(SAMPLE_FILE_PATH)
+    patient_data = read_csv_patient_data(DATA_PATH)
     total_summary(patient_data)
