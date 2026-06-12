@@ -7,7 +7,6 @@ MAX_LATE_BALANCE = 0
 MAX_TOTAL_BALANCE = 1000
 
 SAMPLE_DATA_FILE = "pseudo_dental_revenue_leaks.csv"
-COLUMN_MAPPING_TEST_FILE = "flexible_column_mapping_test.csv"
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_PATH = BASE_DIR / "data" / SAMPLE_DATA_FILE

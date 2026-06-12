@@ -27,8 +27,6 @@ def generate_all_reports(data):
 
 def category_summary(report, statement, balance_field):
     # Prints a summary of patients who applied to category into console
-    #print(TODAY)
-    #print(f"Report Created: C:/Users/bayca/revenue_leak_project/output/{category_type}.csv")
     total_owed = 0
     claim_count = 0
 
@@ -37,11 +35,11 @@ def category_summary(report, statement, balance_field):
 
         for claim_id, claim_info in claims.items():
             total_owed += claim_info[balance_field]
+    if claim_count == 0:
+        print(f"No claims found for {statement}")
     print(f"{statement}: {claim_count} claims | ${total_owed:,.2f}")
 
     return total_owed
-    #print(f"Oldest Balance: {find_oldest_balance(report)} days")
-    #print(f"Largest Balance: ${find_largest_balance(report, balance_field):,.2f}")
 
 def total_summary(data):
     print(TODAY)
