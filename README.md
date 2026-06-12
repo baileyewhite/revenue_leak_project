@@ -14,15 +14,23 @@ The script analyzes sample patient and claim data, generates category-specific C
   - Total unique claims flagged
   - Total unique revenue at risk
   - List of reports created
+- Supports flexible column mapping for alternate CSV header names
+
+## Flexible Column Mapping
+
+The script can recognize multiple possible header names for required CSV fields. For example, the service date column can be named `service_date`, `last_service_date`, `date_of_service`, or `DOS`.
+
+This makes the tool more flexible for CSV files that use different naming conventions.
 
 ## Revenue Leak Categories
+
 - Patient balances overdue 60 days
 - Total balances over $1,000
 - Denied/rejected insurance claims
 - Old submitted insurance claims
 - Pending insurance claims
 - Unresolved appealed claims
-
+  
 ## Project Structure
 
 ```text
@@ -50,7 +58,8 @@ revenue_leak_project/
 - From the project folder, run the script: 
   ```bash
   python src/main.py
-- The script will print a business report summary to the terminal and create multiple category-specific CSV reports in the `output/` folder
+  ```
+- The script will print a business report summary to the terminal and create multiple category-specific CSV reports in the `output/` folder.
 
 ## Important Notes
 - This project uses fake sample patient data for current testing. Real patient data should not be committed to Git.
