@@ -12,7 +12,7 @@ The script analyzes sample patient and claim data, generates category-specific C
 - Generates a validation error report for invalid CSV rows
 - Skips invalid rows and continues generating revenue reports from valid rows
 - Generates and exports the detected results to separate CSV files for each revenue leak category and one CSV file for all combined revenue leaks
-- Prints a terminal summary with:
+- Prints a terminal summary and to an executive summary text file with:
   - Claim counts by category
   - Total unique claims flagged
   - Total unique revenue at risk
@@ -55,6 +55,7 @@ revenue_leak_project/
     balances_overdue_past_60_days.csv
     combined_revenue_leak_report.csv
     denied_insurance_claims.csv
+    executive_summary.txt
     old_submitted_claims.csv
     pending_insurance_claims.csv
     unresolved_appealed_claims.csv
@@ -90,6 +91,15 @@ python src/main.py --input data/csv_file_name.csv
 ```
 
 - The script will print a business report summary to the terminal and create multiple category-specific CSV reports in the `output/` folder.
+
+## Generated Outputs
+
+The script creates several files in the `output/` folder:
+
+- Category-specific CSV reports for each revenue leak type
+- `combined_revenue_leak_report.csv`, which combines all flagged claims into one file
+- `validation_errors.csv`, which lists invalid rows that were skipped
+- `executive_summary.txt`, which saves the terminal summary in a business-readable text file
 
 ## Running Tests
 

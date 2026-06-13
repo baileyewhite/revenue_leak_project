@@ -7,18 +7,19 @@ def generate_all_reports(data):
     reports = []
     output_paths = []
     reports_by_category = []
+    category_summary_lines = []
 
     for category in REPORT_CATEGORIES:
         report = category["finder"](data)
 
         output_path = write_report_to_csv(report, category["category_type"])
 
-        category_summary(
+        summary_line = category_summary(
             report,
             category["statement"],
             category["balance_field"]
         )
-
+        category_summary_lines.append(summary_line)
         reports.append(report)
 
         reports_by_category.append({
@@ -34,7 +35,7 @@ def generate_all_reports(data):
 
     unique_claim_count, unique_total_exposure = calculate_unique_claim_exposure(reports)
 
-    return unique_claim_count, unique_total_exposure, output_paths
+    return unique_claim_count, unique_total_exposure, output_paths, category_summary_lines
 
 def category_summary(report, statement, balance_field):
     # Prints a summary of patients who applied to category into console
@@ -47,29 +48,51 @@ def category_summary(report, statement, balance_field):
         for claim_id, claim_info in claims.items():
             total_owed += claim_info[balance_field]
     if claim_count == 0:
-        print(f"No claims found for {statement}")
+        return f"No claims found for {statement}"
     if claim_count > 0:
-        print(f"{statement}: {claim_count} claims | ${total_owed:,.2f}")
+        return f"{statement}: {claim_count} claims | ${total_owed:,.2f}"
 
     return total_owed
 
 def total_summary(data, validation_errors):
-    print(TODAY)
-    print("Revenue Leak Summary")
-    print("--------------------")
-    if validation_errors:
-        print("*Reports were generated with errors, and used valid rows only*")
-        print()
-    unique_claim_count, unique_total_revenue_risk, output_paths = generate_all_reports(data)
-    print()
-    print("--------------------")
-    print(f"Total unique claims flagged: {unique_claim_count}")
-    print(f"Total unique revenue at risk: ${unique_total_revenue_risk:,.2f}")
+    summary_lines = []
 
-    print()
-    print("Reports Created:")
+    def add_line(line=""):
+        print(line)
+        summary_lines.append(str(line))
+
+    add_line(str(TODAY))
+    add_line("Revenue Leak Summary")
+    add_line("--------------------")
+
+    if validation_errors:
+        invalid_rows = len({error["row_number"] for error in validation_errors})
+        total_errors = len(validation_errors)
+
+        add_line("Validation Warning")
+        add_line("------------------")
+        add_line("Reports were generated using valid rows only.")
+        add_line(f"{invalid_rows} invalid row(s) were skipped.")
+        add_line(f"{total_errors} error(s) were found.")
+        add_line()
+
+    unique_claim_count, unique_total_revenue_risk, output_paths, category_summary_lines = generate_all_reports(data)
+
+    for line in category_summary_lines:
+        add_line(line)
+
+    add_line()
+    add_line("--------------------")
+    add_line(f"Total unique claims flagged: {unique_claim_count}")
+    add_line(f"Total unique revenue at risk: ${unique_total_revenue_risk:,.2f}")
+
+    add_line()
+    add_line("Revenue Reports Created:")
+
     for output_path in output_paths:
-        print(f"- {output_path}")
+        add_line(f"- {output_path}")
+
+    return summary_lines
 
 
 def calculate_unique_claim_exposure(reports):

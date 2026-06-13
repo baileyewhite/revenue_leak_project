@@ -1,7 +1,7 @@
 from config import DATA_PATH
 from data_loader import read_csv_patient_data
 from summary import total_summary
-from report_writer import write_validation_errors_to_csv
+from report_writer import write_validation_errors_to_csv, write_executive_summary
 import argparse
 
 def parse_arguments():
@@ -37,7 +37,10 @@ if __name__ == '__main__':
             print()
 
         if patient_data:
-            total_summary(patient_data, validation_errors)
+            summary_lines = total_summary(patient_data, validation_errors)
+            executive_summary_path = write_executive_summary(summary_lines)
+            print()
+            print(f"Summary written to: {executive_summary_path}")
         else:
             print("No valid rows found. Revenue reports were not generated.")
 

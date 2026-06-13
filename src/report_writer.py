@@ -92,3 +92,13 @@ def write_validation_errors_to_csv(validation_errors):
         writer.writerows(validation_errors)
 
     return output_path
+
+def write_executive_summary(summary_lines):
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    output_path = OUTPUT_DIR / f"executive_summary.txt"
+
+    with open(output_path, 'w', encoding="utf-8") as file:
+        for line in summary_lines:
+            file.write(line + '\n')
+
+    return output_path
