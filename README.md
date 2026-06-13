@@ -10,7 +10,7 @@ Revenue Leak Detector is designed to help identify dental claims and patient bal
 
 ## Current Features
 
-- Accepts optional command-line input path to analyze different CSV files
+- Supports configurable run settings through `config/run_config.json`, with optional command-line overrides- 
 - Reads patient and claim data from a CSV file
 - Detects revenue leaks based on multiple reporting categories
 - Scores flagged claims by risk level to help prioritize follow-up
@@ -90,6 +90,9 @@ revenue_leak_project/
     test_deidentification.py
     test_leak_categories.py
     test_summary.py
+  user_config/
+    rules.json
+    run_config.json
   pytest.ini
   README.md
   requirements.txt
@@ -97,7 +100,7 @@ revenue_leak_project/
 
 ## How to Run
 
-To run with default sample CSV: 
+To run with default settings in `config/run_config.json`:
 
 ```bash
 python src/main.py
@@ -115,7 +118,30 @@ To run with a specific CSV file:
 python src/main.py --input data/csv_file_name.csv 
 ```
 
+To run with a different configuration file:
+
+```bash
+python src/main.py --config config/run_config.json
+```
+
 - The script will print a business report summary to the terminal and create multiple category-specific CSV and text outputs in the `output/` folder.
+
+## Run Configuration
+
+The project includes a `config/run_config.json` file for default run settings.
+
+Example:
+
+```json
+{
+  "input_file": "data/sample_dental_claims.csv",
+  "deidentify": false
+}
+```
+
+The input_file value controls which CSV file is analyzed by default. The deidentify value controls whether patient and claim identifiers are masked in generated reports.
+
+Command-line arguments can override these defaults for a single run.
 
 ## Generated Outputs
 
@@ -198,6 +224,7 @@ Planned improvements:
 
 ## Important Notes
 - This project uses fake sample patient data for current testing. Real patient data should not be committed to Git.
+- `config/run_config.json` should point to synthetic, sample, or de-identified data only.
 - Files in the `output/` folder is generated and may not be committed to Git.
 - De-identification mode masks patient and claim identifiers for demo purposes. It should not be treated as a legal determination that real health data has been de-identified.
 - File paths are handled relative to the project folder, so the script does not depend on a specific user directory.

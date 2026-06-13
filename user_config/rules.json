@@ -1,0 +1,12 @@
+{
+  "past_due_days": 60,
+  "large_balance_threshold": 1000,
+  "risk_thresholds": {
+    "medium_days": 90,
+    "high_days": 180,
+    "critical_days": 240,
+    "medium_balance": 750,
+    "high_balance": 1500,
+    "critical_balance": 3000
+  }
+}

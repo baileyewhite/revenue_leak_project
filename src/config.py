@@ -9,8 +9,12 @@ MAX_TOTAL_BALANCE = 1000
 SAMPLE_DATA_FILE = "sample_dental_claims.csv"
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-DATA_PATH = BASE_DIR / "data" / SAMPLE_DATA_FILE
+DATA_PATH = BASE_DIR / "data"
 OUTPUT_DIR = BASE_DIR / "output"
+
+CONFIG_DIR = BASE_DIR / "user_config"
+DEFAULT_RUN_CONFIG_PATH = CONFIG_DIR / "run_config.json"
+DEFAULT_RULES_PATH = CONFIG_DIR / "rules.json"
 
 COLUMN_ALIASES = {
     "patient_id": ["patient_id", "Patient ID", "patient_number", "account_number"],
