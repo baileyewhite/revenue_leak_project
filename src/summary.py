@@ -42,15 +42,29 @@ def category_summary(report, statement, balance_field):
     total_owed = 0
     claim_count = 0
 
+    risk_counts = {
+        "low": 0,
+        "medium": 0,
+        "high": 0,
+        "critical": 0
+    }
+
     for patient_id, claims in report.items():
         claim_count += len(claims)
-
         for claim_id, claim_info in claims.items():
             total_owed += claim_info[balance_field]
-    if claim_count == 0:
-        return f"No claims found for {statement}"
-    if claim_count > 0:
-        return f"{statement}: {claim_count} claims | ${total_owed:,.2f}"
+
+            if claim_info['risk_level'] == "Low":
+                risk_counts['low'] += 1
+            if claim_info['risk_level'] == "Medium":
+                risk_counts['medium'] += 1
+            if claim_info['risk_level'] == "High":
+                risk_counts['high'] += 1
+            if claim_info['risk_level'] == "Critical":
+                risk_counts['critical'] += 1
+
+    risk_summary = format_risk_summary(risk_counts)
+    return f"{statement}: {claim_count} claims | ${total_owed:,.2f} | {risk_summary}"
 
     return total_owed
 
@@ -69,9 +83,7 @@ def total_summary(data, validation_errors):
         invalid_rows = len({error["row_number"] for error in validation_errors})
         total_errors = len(validation_errors)
 
-        add_line("Validation Warning")
-        add_line("------------------")
-        add_line("Reports were generated using valid rows only.")
+        add_line("*Reports were generated using valid rows only*")
         add_line(f"{invalid_rows} invalid row(s) were skipped.")
         add_line(f"{total_errors} error(s) were found.")
         add_line()
@@ -111,3 +123,18 @@ def calculate_unique_claim_exposure(reports):
                     claim_count += 1
 
     return claim_count, total_exposure
+
+def format_risk_summary(risk_counts):
+    risk_order = ["low", "medium", "high", "critical"]
+    parts = []
+
+    for risk_level in risk_order:
+        count = risk_counts.get(risk_level, 0)
+
+        if count > 0:
+            parts.append(f"{count} {risk_level}")
+
+    if not parts:
+        return "Risk: none"
+
+    return "Risk: " + ", ".join(parts)

@@ -9,6 +9,7 @@ The script analyzes sample patient and claim data, generates category-specific C
 - Accepts optional command-line input path to analyze different CSV files
 - Reads patient and claim data from a CSV file
 - Detects revenue leaks based on multiple reporting categories
+- Scores flagged claims by risk level to help prioritize follow-up
 - Generates a validation error report for invalid CSV rows
 - Skips invalid rows and continues generating revenue reports from valid rows
 - Generates and exports the detected results to separate CSV files for each revenue leak category and one CSV file for all combined revenue leaks
@@ -43,6 +44,17 @@ Examples of validation issues include invalid date values, invalid money values,
 - Old submitted insurance claims
 - Pending insurance claims
 - Unresolved appealed claims
+
+## Risk Scoring
+
+Flagged claims are assigned a risk level to help prioritize follow-up. Risk levels are included in the category-specific reports, the combined revenue leak report, the terminal summary, and the executive summary.
+
+Risk levels currently include:
+
+- Low
+- Medium
+- High
+- Critical
   
 ## Project Structure
 

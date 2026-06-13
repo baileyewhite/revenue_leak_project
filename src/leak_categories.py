@@ -10,8 +10,23 @@ def add_claim_to_report(report, patient_id, claim_id, claim_info):
         "total_balance": claim_info["total_balance"],
         "service_date": claim_info["service_date"],
         "days_past": claim_info["days_past"],
-        "claim_status": claim_info["claim_status"]
+        "claim_status": claim_info["claim_status"],
+        "risk_level": risk_level(claim_info)
     }
+
+def risk_level(claim_info):
+    total_balance = claim_info['total_balance']
+    days_past = claim_info['days_past']
+    claim_status = claim_info['claim_status']
+
+    if total_balance >= 2500 or days_past >= 240:
+        return "Critical"
+    elif total_balance >= 1500 or claim_status in ['denied', 'rejected']:
+        return "High"
+    elif total_balance >= 750 or days_past >= 90:
+        return "Medium"
+    else:
+        return "Low"
 
 ### CATEGORY FINDERS ###
 ### MAKES REPORTS ###

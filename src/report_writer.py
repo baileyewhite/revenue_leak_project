@@ -10,7 +10,8 @@ def write_report_to_csv(report, category_type):
         "Insurance Balance",
         "Total Balance",
         "Days Since Service",
-        "Claim Status"]
+        "Claim Status",
+        "Risk Level"]
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     output_path = OUTPUT_DIR / f"{category_type}.csv"
@@ -28,7 +29,8 @@ def write_report_to_csv(report, category_type):
                     "Insurance Balance": claim_info['insurance_balance'],
                     "Total Balance": claim_info['total_balance'],
                     "Days Since Service": claim_info['days_past'],
-                    "Claim Status": claim_info['claim_status']
+                    "Claim Status": claim_info['claim_status'],
+                    "Risk Level": claim_info['risk_level']
                 })
     return output_path
 
@@ -47,7 +49,8 @@ def write_combined_report_to_csv(reports_by_category):
         "patient_balance",
         "insurance_balance",
         "total_balance",
-        "claim_status"
+        "claim_status",
+        "risk_level"
     ]
 
     with open(output_path, "w", newline="", encoding="utf-8") as csvfile:
@@ -71,7 +74,8 @@ def write_combined_report_to_csv(reports_by_category):
                         "patient_balance": claim_info["patient_balance"],
                         "insurance_balance": claim_info["insurance_balance"],
                         "total_balance": claim_info["total_balance"],
-                        "claim_status": claim_info["claim_status"]
+                        "claim_status": claim_info["claim_status"],
+                        "risk_level": claim_info["risk_level"]
                     })
 
     return output_path
