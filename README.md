@@ -18,6 +18,7 @@ The script analyzes sample patient and claim data, generates category-specific C
   - Total unique claims flagged
   - Total unique revenue at risk
   - List of reports created
+- Supports optional de-identification mode to mask patient and claim identifiers in generated reports
 - Supports flexible column mapping for alternate CSV header names
 - Provides user-friendly error handling for missing files, missing columns, invalid dates, and invalid money values
 - Includes automated testing for data loading, revenue leak logic, and summary calculations
@@ -96,6 +97,12 @@ To run with default sample CSV:
 python src/main.py
 ```
 
+To run with de-identification mode:
+
+```bash
+python src/main.py --input data/csv_file_name.csv --deidentify
+```
+
 To run with a specific CSV file:
 
 ```bash
@@ -134,5 +141,6 @@ The tests currently check CSV parsing, flexible column mapping, revenue leak cat
 ## Important Notes
 - This project uses fake sample patient data for current testing. Real patient data should not be committed to Git.
 - Data in the `output/` folder is generated and may not be committed to Git.
+- De-identification mode masks patient and claim identifiers for demo purposes. It should not be treated as a legal determination that real health data has been de-identified.
 - File paths are handled relative to the project folder, so the script does not depend on a specific user directory.
 - If invalid rows are found, revenue reports are generated from valid rows only.

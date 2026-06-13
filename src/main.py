@@ -2,6 +2,7 @@ from config import DATA_PATH
 from data_loader import read_csv_patient_data
 from summary import total_summary
 from report_writer import write_validation_errors_to_csv, write_executive_summary
+from deidentification import deidentify_patient_data
 import argparse
 
 def parse_arguments():
@@ -16,6 +17,12 @@ def parse_arguments():
         help='Path to input CSV file. Defaults to sample data file.'
     )
 
+    parser.add_argument(
+        "--deidentify",
+        action="store_true",
+        help="Mask patient and claim identifiers in generated reports."
+    )
+
     return parser.parse_args()
 
 if __name__ == '__main__':
@@ -23,6 +30,11 @@ if __name__ == '__main__':
 
     try:
         patient_data, validation_errors = read_csv_patient_data(args.input)
+
+        if args.deidentify:
+            patient_data = deidentify_patient_data(patient_data)
+            print("De-identification mode enabled: patient and claim IDs are masked in output reports.")
+            print()
 
         if validation_errors:
             errors_output_path = write_validation_errors_to_csv(validation_errors)
