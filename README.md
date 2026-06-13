@@ -4,6 +4,10 @@ This is a Python project that reads synthetic dental claims data and identifies 
 
 The script analyzes sample patient and claim data, generates category-specific CSV reports, and prints a business-style summary to the terminal.
 
+## Use Case
+
+Revenue Leak Detector is designed to help identify dental claims and patient balances that may need follow-up. It analyzes CSV exports and creates prioritized reports for overdue balances, denied claims, pending insurance claims, appealed claims, and other possible revenue leaks.
+
 ## Current Features
 
 - Accepts optional command-line input path to analyze different CSV files
@@ -13,7 +17,7 @@ The script analyzes sample patient and claim data, generates category-specific C
 - Generates a validation error report for invalid CSV rows
 - Skips invalid rows and continues generating revenue reports from valid rows
 - Generates and exports the detected results to separate CSV files for each revenue leak category and one CSV file for all combined revenue leaks
-- Prints a terminal summary and to an executive summary text file with:
+- Prints a terminal summary and saves an executive summary text file with:
   - Claim counts by category
   - Total unique claims flagged
   - Total unique revenue at risk
@@ -76,12 +80,14 @@ revenue_leak_project/
   src/
     config.py
     data_loader.py
+    deidentification.py
     leak_categories.py
     main.py
     report_writer.py
     summary.py
   tests/
     test_data_loader.py
+    test_deidentification.py
     test_leak_categories.py
     test_summary.py
   pytest.ini
@@ -109,7 +115,7 @@ To run with a specific CSV file:
 python src/main.py --input data/csv_file_name.csv 
 ```
 
-- The script will print a business report summary to the terminal and create multiple category-specific CSV reports in the `output/` folder.
+- The script will print a business report summary to the terminal and create multiple category-specific CSV and text outputs in the `output/` folder.
 
 ## Generated Outputs
 
@@ -138,9 +144,61 @@ python -m pytest
 
 The tests currently check CSV parsing, flexible column mapping, revenue leak category logic, and unique revenue exposure calculations.
 
+## Input CSV Format
+
+The input CSV should contain claim-level rows with the following required fields:
+
+| Field | Description |
+|---|---|
+| patient_id | Unique patient identifier |
+| claim_id | Unique claim identifier |
+| service_date | Date of service in `YYYY-MM-DD` format |
+| patient_balance | Amount owed by the patient |
+| insurance_balance | Amount owed by insurance |
+| total_balance | Total outstanding balance |
+| claim_status | Current claim status |
+
+## Supported Column Aliases
+
+The script can recognize alternate header names, such as:
+
+| Standard Field | Supported Examples |
+|---|---|
+| patient_id | `patient_id`, `Patient ID`, `patient_number`, `account_number` |
+| claim_id | `claim_id`, `Claim ID`, `claim_number`, `encounter_id` |
+| service_date | `service_date`, `last_service_date`, `date_of_service`, `DOS` |
+| patient_balance | `patient_balance`, `Patient Balance`, `amount_due`, `patient_due` |
+| insurance_balance | `insurance_balance`, `Insurance Balance`, `insurance_due` |
+| total_balance | `total_balance`, `Total Balance`, `balance`, `outstanding_balance` |
+| claim_status | `claim_status`, `Claim Status`, `status` |
+
+## Privacy and Data Notice
+
+This project is intended for synthetic, sample, or de-identified data only. Do not commit real patient data, claim exports, or other sensitive health information to Git.
+
+Optional de-identification mode masks patient and claim identifiers in generated reports for demo purposes. This should not be treated as a legal determination that real health data has been de-identified.
+
+## Limitations
+
+- The tool currently analyzes CSV files only.
+- Date values are expected in `YYYY-MM-DD` format.
+- Risk scoring rules are simple rule-based thresholds.
+- The project does not connect directly to dental practice management systems.
+- The project is not a replacement for professional billing review or compliance review.
+
+## Roadmap
+
+Planned improvements:
+
+- Add more detailed risk scoring rules
+- Add trend comparison between report runs
+- Add more automated tests
+- Add sample executive summary output
+- Improve validation reporting for more data quality issues
+
 ## Important Notes
 - This project uses fake sample patient data for current testing. Real patient data should not be committed to Git.
-- Data in the `output/` folder is generated and may not be committed to Git.
+- Files in the `output/` folder is generated and may not be committed to Git.
 - De-identification mode masks patient and claim identifiers for demo purposes. It should not be treated as a legal determination that real health data has been de-identified.
 - File paths are handled relative to the project folder, so the script does not depend on a specific user directory.
 - If invalid rows are found, revenue reports are generated from valid rows only.
