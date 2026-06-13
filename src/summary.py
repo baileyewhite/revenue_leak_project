@@ -1,6 +1,6 @@
 from config import TODAY
 from leak_categories import REPORT_CATEGORIES
-from report_writer import write_report_to_csv, write_combined_report_to_csv
+from report_writer import write_report_to_csv, write_combined_report_to_csv, write_validation_errors_to_csv
 
 ### MAIN GENERATOR ###
 def generate_all_reports(data):
@@ -48,15 +48,20 @@ def category_summary(report, statement, balance_field):
             total_owed += claim_info[balance_field]
     if claim_count == 0:
         print(f"No claims found for {statement}")
-    print(f"{statement}: {claim_count} claims | ${total_owed:,.2f}")
+    if claim_count > 0:
+        print(f"{statement}: {claim_count} claims | ${total_owed:,.2f}")
 
     return total_owed
 
-def total_summary(data):
+def total_summary(data, validation_errors):
     print(TODAY)
     print("Revenue Leak Summary")
     print("--------------------")
+    if validation_errors:
+        print("*Reports were generated with errors, and used valid rows only*")
+        print()
     unique_claim_count, unique_total_revenue_risk, output_paths = generate_all_reports(data)
+    print()
     print("--------------------")
     print(f"Total unique claims flagged: {unique_claim_count}")
     print(f"Total unique revenue at risk: ${unique_total_revenue_risk:,.2f}")

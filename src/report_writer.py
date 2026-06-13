@@ -75,3 +75,20 @@ def write_combined_report_to_csv(reports_by_category):
                     })
 
     return output_path
+
+def write_validation_errors_to_csv(validation_errors):
+    headers = [
+        "row_number",
+        "field_name",
+        "value",
+        "message",]
+
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    output_path = OUTPUT_DIR / f"validation_errors.csv"
+
+    with open(output_path, 'w', newline='', encoding="utf-8") as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=headers)
+        writer.writeheader()
+        writer.writerows(validation_errors)
+
+    return output_path

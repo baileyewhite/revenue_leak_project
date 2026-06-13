@@ -6,8 +6,11 @@ The script analyzes sample patient and claim data, generates category-specific C
 
 ## Current Features
 
+- Accepts optional command-line input path to analyze different CSV files
 - Reads patient and claim data from a CSV file
 - Detects revenue leaks based on multiple reporting categories
+- Generates a validation error report for invalid CSV rows
+- Skips invalid rows and continues generating revenue reports from valid rows
 - Generates and exports the detected results to separate CSV files for each revenue leak category and one CSV file for all combined revenue leaks
 - Prints a terminal summary with:
   - Claim counts by category
@@ -23,6 +26,14 @@ The script analyzes sample patient and claim data, generates category-specific C
 The script can recognize multiple possible header names for required CSV fields. For example, the service date column can be named `service_date`, `last_service_date`, `date_of_service`, or `DOS`.
 
 This makes the tool more flexible for CSV files that use different naming conventions.
+
+## Validation Report
+
+If the input CSV contains invalid rows, the script creates a `validation_errors.csv` file in the `output/` folder.
+
+The validation report includes the row number, field name, invalid value, and error message. Invalid rows are skipped, and revenue reports are generated using the valid rows only.
+
+Examples of validation issues include invalid date values, invalid money values, and missing required row values.
 
 ## Revenue Leak Categories
 
@@ -47,6 +58,7 @@ revenue_leak_project/
     old_submitted_claims.csv
     pending_insurance_claims.csv
     unresolved_appealed_claims.csv
+    validation_errors.csv
   src/
     config.py
     data_loader.py
@@ -101,3 +113,4 @@ The tests currently check CSV parsing, flexible column mapping, revenue leak cat
 - This project uses fake sample patient data for current testing. Real patient data should not be committed to Git.
 - Data in the `output/` folder is generated and may not be committed to Git.
 - File paths are handled relative to the project folder, so the script does not depend on a specific user directory.
+- If invalid rows are found, revenue reports are generated from valid rows only.

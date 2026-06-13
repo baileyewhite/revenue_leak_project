@@ -5,34 +5,105 @@ from datetime import date
 def read_csv_patient_data(file_path):
     # Receives a CSV file and outputs patient_data
     patient_data = {}
+    validation_errors = []
 
-    with open(file_path, 'r', newline='') as csvfile:
+    with open(file_path, 'r', newline='', encoding="utf-8") as csvfile:
         reader = csv.DictReader(csvfile)
         column_map = map_columns(reader.fieldnames)
 
         for row_number, row in enumerate(reader, start=2):
-            patient_id = row[column_map['patient_id']]
-            claim_id = row[column_map['claim_id']]
+            row_has_error = False
 
-            service_date = parse_date(row[column_map["service_date"]], row_number)
-            days_past = (TODAY - service_date).days
-
-            patient_balance = parse_money(
-                    row[column_map["patient_balance"]],
-                    "patient_balance",
-                    row_number
-                )
-            insurance_balance = parse_money(
-                    row[column_map["insurance_balance"]],
-                    "insurance_balance",
-                    row_number
-                )
-            total_balance = parse_money(
-                    row[column_map["total_balance"]],
-                    "total_balance",
-                    row_number
-                )
+            patient_id = row[column_map["patient_id"]]
+            claim_id = row[column_map["claim_id"]]
             claim_status = row[column_map["claim_status"]]
+
+            if not patient_id.strip():
+                validation_errors.append({
+                    "row_number": row_number,
+                    "field_name": "patient_id",
+                    "value": patient_id,
+                    "message": "Missing patient ID"
+                })
+                row_has_error = True
+
+            if not claim_id.strip():
+                validation_errors.append({
+                    "row_number": row_number,
+                    "field_name": "claim_id",
+                    "value": claim_id,
+                    "message": "Missing claim ID"
+                })
+                row_has_error = True
+
+            if not claim_status.strip():
+                validation_errors.append({
+                    "row_number": row_number,
+                    "field_name": "claim_status",
+                    "value": claim_status,
+                    "message": "Missing claim status"
+                })
+                row_has_error = True
+
+            try:
+                service_date = parse_date(row[column_map["service_date"]], row_number)
+                days_past = (TODAY - service_date).days
+            except ValueError as error:
+                validation_errors.append({
+                    "row_number": row_number,
+                    "field_name": "service_date",
+                    "value": row[column_map["service_date"]],
+                    "message": str(error),
+                })
+                row_has_error = True
+
+            try:
+                patient_balance = parse_money(
+                        row[column_map["patient_balance"]],
+                        "patient_balance",
+                        row_number
+                    )
+            except ValueError as error:
+                validation_errors.append({
+                    "row_number": row_number,
+                    "field_name": "patient_balance",
+                    "value": row[column_map["patient_balance"]],
+                    "message": str(error),
+                })
+                row_has_error = True
+
+            try:
+                insurance_balance = parse_money(
+                        row[column_map["insurance_balance"]],
+                        "insurance_balance",
+                        row_number
+                    )
+            except ValueError as error:
+                validation_errors.append({
+                    "row_number": row_number,
+                    "field_name": "insurance_balance",
+                    "value": row[column_map["insurance_balance"]],
+                    "message": str(error),
+                })
+                row_has_error = True
+
+            try:
+                total_balance = parse_money(
+                        row[column_map["total_balance"]],
+                        "total_balance",
+                        row_number
+                    )
+            except ValueError as error:
+                validation_errors.append({
+                    "row_number": row_number,
+                    "field_name": "total_balance",
+                    "value": row[column_map["total_balance"]],
+                    "message": str(error),
+                })
+                row_has_error = True
+
+            if row_has_error:
+                continue
 
             if patient_id not in patient_data:
                 patient_data[patient_id] = {}
@@ -46,7 +117,7 @@ def read_csv_patient_data(file_path):
                 "claim_status": claim_status
             }
 
-    return patient_data
+    return patient_data, validation_errors
 
 def normalize_header(header):
     return header.strip().lower().replace(" ", "_")
