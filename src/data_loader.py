@@ -6,50 +6,45 @@ def read_csv_patient_data(file_path):
     # Receives a CSV file and outputs patient_data
     patient_data = {}
 
-    try:
-        with open(file_path, 'r', newline='') as csvfile:
-            reader = csv.DictReader(csvfile)
-            column_map = map_columns(reader.fieldnames)
+    with open(file_path, 'r', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        column_map = map_columns(reader.fieldnames)
 
-            for row_number, row in enumerate(reader, start=2):
-                patient_id = row[column_map['patient_id']]
-                claim_id = row[column_map['claim_id']]
+        for row_number, row in enumerate(reader, start=2):
+            patient_id = row[column_map['patient_id']]
+            claim_id = row[column_map['claim_id']]
 
-                service_date = parse_date(row[column_map["service_date"]], row_number)
-                days_past = (TODAY - service_date).days
+            service_date = parse_date(row[column_map["service_date"]], row_number)
+            days_past = (TODAY - service_date).days
 
-                patient_balance = parse_money(
-                        row[column_map["patient_balance"]],
-                        "patient_balance",
-                        row_number
-                    )
-                insurance_balance = parse_money(
-                        row[column_map["insurance_balance"]],
-                        "insurance_balance",
-                        row_number
-                    )
-                total_balance = parse_money(
-                        row[column_map["total_balance"]],
-                        "total_balance",
-                        row_number
-                    )
-                claim_status = row[column_map["claim_status"]]
+            patient_balance = parse_money(
+                    row[column_map["patient_balance"]],
+                    "patient_balance",
+                    row_number
+                )
+            insurance_balance = parse_money(
+                    row[column_map["insurance_balance"]],
+                    "insurance_balance",
+                    row_number
+                )
+            total_balance = parse_money(
+                    row[column_map["total_balance"]],
+                    "total_balance",
+                    row_number
+                )
+            claim_status = row[column_map["claim_status"]]
 
-                if patient_id not in patient_data:
-                    patient_data[patient_id] = {}
+            if patient_id not in patient_data:
+                patient_data[patient_id] = {}
 
-                patient_data[patient_id][claim_id] = {
-                    "service_date": service_date,
-                    "days_past": days_past,
-                    "patient_balance": patient_balance,
-                    "insurance_balance": insurance_balance,
-                    "total_balance": total_balance,
-                    "claim_status": claim_status
-                }
-
-    except FileNotFoundError:
-        print(f"Error: Could not find file {file_path}")
-        return {}
+            patient_data[patient_id][claim_id] = {
+                "service_date": service_date,
+                "days_past": days_past,
+                "patient_balance": patient_balance,
+                "insurance_balance": insurance_balance,
+                "total_balance": total_balance,
+                "claim_status": claim_status
+            }
 
     return patient_data
 

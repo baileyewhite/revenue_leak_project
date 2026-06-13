@@ -64,10 +64,19 @@ revenue_leak_project/
 ```
 
 ## How to Run
-- From the project folder, run the script: 
-  ```bash
-  python src/main.py
-  ```
+
+To run with default sample CSV: 
+
+```bash
+python src/main.py
+```
+
+To run with a specific CSV file:
+
+```bash
+python src/main.py --input data/csv_file_name.csv 
+```
+
 - The script will print a business report summary to the terminal and create multiple category-specific CSV reports in the `output/` folder.
 
 ## Running Tests
