@@ -14,8 +14,8 @@ Revenue Leak Detector is designed to help identify dental claims and patient bal
 - Reads patient and claim data from a CSV file
 - Detects revenue leaks based on multiple reporting categories
 - Scores flagged claims by risk level to help prioritize follow-up
-- Generates a validation error report for invalid CSV rows
-- Skips invalid rows and continues generating revenue reports from valid rows
+- Includes recommended follow-up actions and priority reasons for each flagged claim to support workflow prioritization
+- Identifies invalid rows and generates a validation error report for invalid CSV rows while continuing to generate reports with valid rows
 - Generates and exports the detected results to separate CSV files for each revenue leak category and one CSV file for all combined revenue leaks
 - Prints a terminal summary and saves an executive summary text file with:
   - Claim counts by category
@@ -78,6 +78,7 @@ revenue_leak_project/
     unresolved_appealed_claims.csv
     validation_errors.csv
   src/
+    action_recommendations.py
     config.py
     data_loader.py
     deidentification.py
@@ -86,6 +87,7 @@ revenue_leak_project/
     report_writer.py
     summary.py
   tests/
+    test_action_recommendations.py
     test_data_loader.py
     test_deidentification.py
     test_leak_categories.py

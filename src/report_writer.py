@@ -1,4 +1,5 @@
 from config import OUTPUT_DIR
+from action_recommendations import get_recommended_action, get_priority_reason
 import csv
 
 def write_report_to_csv(report, category_type):
@@ -50,7 +51,9 @@ def write_combined_report_to_csv(reports_by_category):
         "insurance_balance",
         "total_balance",
         "claim_status",
-        "risk_level"
+        "risk_level",
+        "recommended_action",
+        "priority_reason"
     ]
 
     with open(output_path, "w", newline="", encoding="utf-8") as csvfile:
@@ -75,7 +78,9 @@ def write_combined_report_to_csv(reports_by_category):
                         "insurance_balance": claim_info["insurance_balance"],
                         "total_balance": claim_info["total_balance"],
                         "claim_status": claim_info["claim_status"],
-                        "risk_level": claim_info["risk_level"]
+                        "risk_level": claim_info["risk_level"],
+                        "recommended_action": get_recommended_action(category_type, claim_info),
+                        "priority_reason": get_priority_reason(category_type, claim_info)
                     })
 
     return output_path
