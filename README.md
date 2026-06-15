@@ -27,7 +27,7 @@ Revenue Leak Detector is designed to help identify dental claims and patient bal
 - Supports optional de-identification mode to mask patient and claim identifiers in generated reports
 - Supports flexible column mapping for alternate CSV header names
 - Provides user-friendly error handling for missing files, missing columns, invalid dates, and invalid money values
-- Includes automated testing for data loading, revenue leak logic, recommended actions, trend comparison, breakdown summaries, de-identification, and summary calculations
+- Includes automated testing for full workflow, data loading, revenue leak logic, recommended actions, trend comparison, breakdown summaries, de-identification, and summary calculations
 - Includes a local Streamlit dashboard with CSV upload, optional comparison upload, de-identification toggle, summary metrics, report tabs, validation results, combined report preview, and downloadable outputs
 
 ## Local Dashboard
@@ -136,6 +136,7 @@ revenue_leak_project/
     test_breakdowns.py
     test_data_loader.py
     test_deidentification.py
+    test_full_workflow.py
     test_leak_categories.py
     test_summary.py
     test_trend_comparison.py
@@ -241,7 +242,7 @@ Run the test suite from the project folder:
 python -m pytest
 ```
 
-The tests currently check CSV parsing, flexible column mapping, revenue leak category logic, summary calculations, de-identification, recommended actions, trend comparison, and breakdown summaries.
+The tests currently check full workflow, CSV parsing, flexible column mapping, revenue leak category logic, summary calculations, de-identification, recommended actions, trend comparison, and breakdown summaries.
 
 ## Input CSV Format
 
