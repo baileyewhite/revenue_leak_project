@@ -31,11 +31,11 @@ def test_generate_report_comparison_counts_new_and_resolved_claims():
     )
 
     assert "Trend Comparison Summary" in result
-    assert "New flagged claims: 1" in result
-    assert "Resolved claims: 1" in result
+    assert "New flagged claims in new file: 1" in result
+    assert "Resolved claims in new file: 1" in result
     assert "Revenue at risk increased by: $900.00" in result
     assert "Revenue at risk decreased by: $300.00" in result
-    assert "Change in revenue risk exposure: $1,200.00" in result
+    assert "Net change in revenue risk exposure: $1,200.00" in result
 
 def test_generate_report_comparison_when_reports_match():
     input_report = {
@@ -60,8 +60,8 @@ def test_generate_report_comparison_when_reports_match():
         compare_path="data/previous.csv"
     )
 
-    assert "New flagged claims: 0" in result
-    assert "Resolved claims: 0" in result
+    assert "New flagged claims in new file: 0" in result
+    assert "Resolved claims in new file: 0" in result
     assert "Revenue at risk increased by: $0.00" in result
     assert "Revenue at risk decreased by: $0.00" in result
-    assert "Change in revenue risk exposure: $0.00" in result
+    assert "Net change in revenue risk exposure: $0.00" in result

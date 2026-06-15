@@ -1,5 +1,4 @@
-from data_loader import read_csv_patient_data
-from summary import calculate_unique_claim_exposure, generate_all_reports
+from summary import format_relative_path
 
 # 1. Read 2 combined reports: current, & comparing
 # 2. Then we have two patient_data dictionaries to compare
@@ -11,7 +10,7 @@ def generate_report_comparison(input_report, compare_report, compare_path):
     comparison_lines = []
 
     def add_line(line=""):
-        print(line)
+        #print(line)
         comparison_lines.append(str(line))
 
     input_claims = {}
@@ -47,13 +46,13 @@ def generate_report_comparison(input_report, compare_report, compare_path):
     add_line("------------------------")
 
     if compare_report:
-        add_line(f"Compared against previous file: {compare_path}")
+        relative_compare_path = str(format_relative_path(compare_path)).replace("\\", "/")
+        add_line(f"Compared input file against new file: {relative_compare_path}")
 
-    add_line(f"New flagged claims: {len(new_claims)}")
-    add_line(f"Resolved claims: {len(resolved_claims)}")
+    add_line(f"New flagged claims in new file: {len(new_claims)}")
+    add_line(f"Resolved claims in new file: {len(resolved_claims)}")
     add_line(f"Revenue at risk increased by: ${risk_increase:,.2f}")
     add_line(f"Revenue at risk decreased by: ${risk_decrease:,.2f}")
-    add_line(f"Change in revenue risk exposure: ${net_risk_exposure:,.2f}")
-    add_line()
+    add_line(f"Net change in revenue risk exposure: ${net_risk_exposure:,.2f}")
 
     return comparison_lines

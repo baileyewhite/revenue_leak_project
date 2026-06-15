@@ -1,5 +1,5 @@
 from data_loader import read_csv_patient_data
-from summary import total_summary
+from summary import total_summary, report_paths_summary
 from breakdowns import breakdown_summary
 from report_writer import write_validation_errors_to_csv, write_executive_summary
 from deidentification import deidentify_patient_data
@@ -109,13 +109,23 @@ if __name__ == '__main__':
             print()
 
         if patient_data:
-            summary_lines = total_summary(patient_data, validation_errors)
+            summary_lines, output_paths = total_summary(patient_data, validation_errors, input_path=input_path)
 
             breakdown_lines = breakdown_summary(patient_data)
             summary_lines.extend(breakdown_lines)
 
             if comparison_lines:
                 summary_lines.extend(comparison_lines)
+
+            report_path_lines = report_paths_summary(output_paths)
+
+            for line in comparison_lines:
+                print(line)
+
+            for line in report_path_lines:
+                print(line)
+
+            summary_lines.extend(report_path_lines)
 
             executive_summary_path = write_executive_summary(summary_lines)
             print()

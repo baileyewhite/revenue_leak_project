@@ -1,6 +1,50 @@
-from config import TODAY
+from config import TODAY, BASE_DIR
 from leak_categories import REPORT_CATEGORIES
+from pathlib import Path
 from report_writer import write_report_to_csv, write_combined_report_to_csv, write_validation_errors_to_csv
+
+## HELPER FUNCTIONS ##
+def format_relative_path(path):
+    path = Path(path)
+
+    try:
+        return path.relative_to(BASE_DIR)
+    except ValueError:
+        return path
+
+
+def report_paths_summary(output_paths):
+    lines = []
+
+    lines.append("")
+    lines.append("Revenue Reports Created")
+    lines.append("-----------------------")
+
+    for output_path in output_paths:
+        relative_path = str(format_relative_path(output_path)).replace("\\", "/")
+        lines.append(f"- {relative_path}")
+
+    return lines
+
+
+def key_takeaways_summary(unique_claim_count, unique_total_revenue_risk):
+    lines = []
+
+    lines.append("")
+    lines.append("Key Takeaways")
+    lines.append("-------------")
+    lines.append(f"- {unique_claim_count} unique claims were flagged for follow-up.")
+    lines.append(
+        f"- ${unique_total_revenue_risk:,.2f} in unique revenue is currently at risk."
+    )
+    lines.append(
+        "- Category totals may overlap because one claim can appear in multiple report categories."
+    )
+    lines.append(
+        "- Review the combined revenue leak report for claim-level recommended actions."
+    )
+
+    return lines
 
 ### MAIN GENERATOR ###
 def generate_all_reports(data):
@@ -66,7 +110,7 @@ def category_summary(report, statement, balance_field):
     risk_summary = format_risk_summary(risk_counts)
     return f"{statement}: {claim_count} claims | ${total_owed:,.2f} | {risk_summary}"
 
-def total_summary(data, validation_errors):
+def total_summary(data, validation_errors, input_path=None):
     summary_lines = []
 
     def add_line(line=""):
@@ -74,8 +118,13 @@ def total_summary(data, validation_errors):
         summary_lines.append(str(line))
 
     add_line(str(TODAY))
+    add_line()
     add_line("Revenue Leak Summary")
     add_line("--------------------")
+    if input_path:
+        relative_input_file = str(format_relative_path(input_path)).replace("\\", "/")
+        add_line(f"Input file: {relative_input_file}")
+        add_line()
 
     if validation_errors:
         invalid_rows = len({error["row_number"] for error in validation_errors})
@@ -92,17 +141,22 @@ def total_summary(data, validation_errors):
         add_line(line)
 
     add_line()
+    add_line("Total Exposure")
     add_line("--------------------")
     add_line(f"Total unique claims flagged: {unique_claim_count}")
     add_line(f"Total unique revenue at risk: ${unique_total_revenue_risk:,.2f}")
-
     add_line()
+    add_line("Note: Category totals may overlap because one claim can be flagged in multiple categories. Unique revenue at risk removes duplicate claims.")
+    for line in key_takeaways_summary(unique_claim_count, unique_total_revenue_risk):
+        add_line(line)
+    '''
     add_line("Revenue Reports Created:")
 
     for output_path in output_paths:
         add_line(f"- {output_path}")
+    '''
 
-    return summary_lines
+    return summary_lines, output_paths
 
 def calculate_unique_claim_exposure(reports):
     seen_claims = set()
