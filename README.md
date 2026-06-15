@@ -24,7 +24,7 @@ Revenue Leak Detector is designed to help identify dental claims and patient bal
   - List of reports created
   - A comparison trend summary when run with the `--compare` command
   - A breakdown summary highlighting top payers, top providers, and top procedures
-- Supports optional de-identification mode to mask patient and claim identifiers in generated reports
+- Supports optional identifier masking mode to mask patient and claim identifiers in generated reports
 - Supports flexible column mapping for alternate CSV header names
 - Provides user-friendly error handling for missing files, missing columns, invalid dates, and invalid money values
 - Includes automated testing for full workflow, data loading, revenue leak logic, recommended actions, trend comparison, breakdown summaries, de-identification, and summary calculations
@@ -85,11 +85,13 @@ The validation report includes the row number, field name, invalid value, and er
 
 Examples of validation issues include invalid date values, invalid money values, and missing required row values.
 
-## De-identification Mode
+## Identifier Masking Mode
 
-When run in de-identification mode, patient IDs and claim IDs are masked and replaced with fake identifiers.
+The tool includes an optional identifier masking mode that replaces patient IDs and claim IDs with generic labels in generated reports.
 
-De-identification mode is meant to demo privacy-conscious masking.
+This feature is intended for demo and portfolio use only. It should not be interpreted as HIPAA de-identification. HIPAA de-identification involves specific methods such as Safe Harbor or Expert Determination, and this project does not claim to perform or certify either method.
+
+This project is intended for synthetic, sample, or already-masked data.
 
 ## Revenue Leak Categories
 
@@ -169,7 +171,7 @@ To generate a trend comparison summary:
 python src/main.py --input data/csv_file_name.csv --compare data/other_csv_file_name.csv
 ```
 
-To run with de-identification mode:
+To run with identifier masking mode:
 
 ```bash
 python src/main.py --input data/csv_file_name.csv --deidentify
