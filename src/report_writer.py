@@ -1,6 +1,8 @@
 from config import OUTPUT_DIR
 from action_recommendations import get_recommended_action, get_priority_reason
 import csv
+import json
+from datetime import datetime
 
 def write_report_to_csv(report, category_type):
     # Generates a CSV report of the list of patients and their info that applied to category
@@ -116,6 +118,16 @@ def write_executive_summary(summary_lines):
 
     with open(output_path, 'w', encoding="utf-8") as file:
         for line in summary_lines:
-            file.write(line + '\n')
+            file.write(str(line) + '\n')
+
+    return output_path
+
+def write_run_metadata(metadata):
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+    output_path = OUTPUT_DIR / "run_metadata.json"
+
+    with open(output_path, "w", encoding="utf-8") as file:
+        json.dump(metadata, file, indent=2, default=str)
 
     return output_path

@@ -1,9 +1,9 @@
 from data_loader import read_csv_patient_data
-from summary import total_summary, report_paths_summary
+from summary import total_summary, report_paths_summary, format_relative_path
 from breakdowns import breakdown_summary
-from report_writer import write_validation_errors_to_csv, write_executive_summary
+from report_writer import write_validation_errors_to_csv, write_executive_summary, write_run_metadata
 from deidentification import deidentify_patient_data
-from config import BASE_DIR, DEFAULT_RUN_CONFIG_PATH
+from config import BASE_DIR, DEFAULT_RUN_CONFIG_PATH, TODAY
 from trend_comparison import generate_report_comparison
 from pathlib import Path
 import argparse
@@ -117,10 +117,24 @@ if __name__ == '__main__':
             if comparison_lines:
                 summary_lines.extend(comparison_lines)
 
-            report_path_lines = report_paths_summary(output_paths)
-
             for line in comparison_lines:
                 print(line)
+
+            metadata = {
+                "run_date": str(TODAY),
+                "input_file": str(format_relative_path(input_path)).replace("\\", "/"),
+                "comparison_file": str(format_relative_path(compare_path)).replace("\\", "/") if compare_path else None,
+                "valid_claims_analyzed": sum(len(claims) for claims in patient_data.values()),
+                "invalid_rows_skipped": len({error["row_number"] for error in validation_errors}),
+                "validation_errors": len(validation_errors),
+                "identifier_masking_enabled": deidentify,
+                "reports_created": len(output_paths),
+            }
+
+            metadata_path = write_run_metadata(metadata)
+            output_paths.append(metadata_path)
+
+            report_path_lines = report_paths_summary(output_paths)
 
             for line in report_path_lines:
                 print(line)
@@ -130,6 +144,7 @@ if __name__ == '__main__':
             executive_summary_path = write_executive_summary(summary_lines)
             print()
             print(f"Summary written to: {executive_summary_path}")
+
         else:
             print("No valid rows found. Revenue reports were not generated.")
 

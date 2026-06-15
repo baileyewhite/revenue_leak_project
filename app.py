@@ -12,7 +12,7 @@ from summary import total_summary, report_paths_summary
 from breakdowns import breakdown_summary
 from trend_comparison import generate_report_comparison
 from deidentification import deidentify_patient_data
-from report_writer import write_executive_summary
+from report_writer import write_executive_summary, write_run_metadata
 
 
 UPLOAD_DIR = BASE_DIR / "output" / "dashboard_uploads"
@@ -123,6 +123,30 @@ elif run_analysis:
 
         if comparison_lines:
             summary_lines.extend(comparison_lines)
+
+        valid_claims_analyzed = sum(
+            len(claims)
+            for claims in patient_data.values()
+        )
+
+        invalid_rows_skipped = len({
+            error["row_number"]
+            for error in validation_errors
+        })
+
+        metadata = {
+            "run_date": str(pd.Timestamp.today().date()),
+            "input_file": str(input_path.relative_to(BASE_DIR)).replace("\\", "/"),
+            "comparison_file": str(compare_path.relative_to(BASE_DIR)).replace("\\", "/") if compare_path else None,
+            "valid_claims_analyzed": valid_claims_analyzed,
+            "invalid_rows_skipped": invalid_rows_skipped,
+            "validation_errors": len(validation_errors) + len(compare_validation_errors),
+            "identifier_masking_enabled": deidentify,
+            "reports_created": len(output_paths) + 2,
+        }
+        
+        metadata_path = write_run_metadata(metadata)
+        output_paths.append(metadata_path)
 
         report_path_lines = report_paths_summary(output_paths)
         summary_lines.extend(report_path_lines)
