@@ -19,3 +19,4 @@ data/*.csv
 
 # Test CSV Data
 !data/sample_dental_claims.csv
+!data/sample_dental_claims_2.csv

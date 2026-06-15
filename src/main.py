@@ -1,9 +1,10 @@
-from config import DATA_PATH
 from data_loader import read_csv_patient_data
 from summary import total_summary
 from report_writer import write_validation_errors_to_csv, write_executive_summary
 from deidentification import deidentify_patient_data
 from config import BASE_DIR, DEFAULT_RUN_CONFIG_PATH
+from trend_comparison import generate_report_comparison
+from pathlib import Path
 import argparse
 import json
 
@@ -31,6 +32,12 @@ def parse_arguments():
         help="Mask patient and claim identifiers in generated reports."
     )
 
+    parser.add_argument(
+        '--compare',
+        default=None,
+        help="Compare two data files to see trend information."
+    )
+
     return parser.parse_args()
 
 def load_run_config(config_path):
@@ -38,25 +45,52 @@ def load_run_config(config_path):
         config = json.load(json_file)
 
     input_file = BASE_DIR / config["input_file"]
-    if input_file.is_dir():
-        raise ValueError(f"Input path points to a folder, not a CSV file: {input_path}")
-    deidentify = config.get("deidentify", False)
 
-    return input_file, deidentify
+    if input_file.is_dir():
+        raise ValueError(f"Input path points to a folder, not a CSV file: {input_file}")
+
+    deidentify = config.get("deidentify", False)
+    compare_file = config.get("compare_file")
+    compare_path = None
+    if compare_file:
+        compare_path = BASE_DIR / compare_file
+
+    return input_file, deidentify, compare_path
 
 if __name__ == '__main__':
     args = parse_arguments()
 
     try:
-        input_path, deidentify = load_run_config(args.config)
+        input_path, deidentify, compare_path = load_run_config(args.config)
 
         if args.input:
-            input_path = args.input
+            input_path = Path(args.input)
+
+            if not input_path.is_absolute():
+                input_path = BASE_DIR / input_path
+
+        if args.compare:
+            compare_path = Path(args.compare)
+
+            if not compare_path.is_absolute():
+                compare_path = BASE_DIR / args.compare
 
         if args.deidentify:
             deidentify = True
 
         patient_data, validation_errors = read_csv_patient_data(input_path)
+
+        comparison_lines = []
+
+        if compare_path:
+            comparing, comparing_validation_errors = read_csv_patient_data(compare_path)
+            validation_errors.extend(comparing_validation_errors)
+
+            comparison_lines = generate_report_comparison(
+                input_report=patient_data,
+                compare_report=comparing,
+                compare_path=compare_path,
+            )
 
         if deidentify:
             patient_data = deidentify_patient_data(patient_data)
@@ -75,6 +109,10 @@ if __name__ == '__main__':
 
         if patient_data:
             summary_lines = total_summary(patient_data, validation_errors)
+
+            if comparison_lines:
+                summary_lines.extend(comparison_lines)
+
             executive_summary_path = write_executive_summary(summary_lines)
             print()
             print(f"Summary written to: {executive_summary_path}")

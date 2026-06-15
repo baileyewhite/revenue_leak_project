@@ -1,5 +1,6 @@
 {
   "input_file": "data/sample_dental_claims.csv",
+  "compare_file": null,
   "deidentify": false,
   "rules_file": "user_config/rules.json"
 }

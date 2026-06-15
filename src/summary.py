@@ -66,8 +66,6 @@ def category_summary(report, statement, balance_field):
     risk_summary = format_risk_summary(risk_counts)
     return f"{statement}: {claim_count} claims | ${total_owed:,.2f} | {risk_summary}"
 
-    return total_owed
-
 def total_summary(data, validation_errors):
     summary_lines = []
 

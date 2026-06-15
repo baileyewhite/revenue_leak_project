@@ -22,6 +22,7 @@ Revenue Leak Detector is designed to help identify dental claims and patient bal
   - Total unique claims flagged
   - Total unique revenue at risk
   - List of reports created
+  - A comparison trend summary (if ran with --compare command)
 - Supports optional de-identification mode to mask patient and claim identifiers in generated reports
 - Supports flexible column mapping for alternate CSV header names
 - Provides user-friendly error handling for missing files, missing columns, invalid dates, and invalid money values
@@ -33,6 +34,14 @@ The script can recognize multiple possible header names for required CSV fields.
 
 This makes the tool more flexible for CSV files that use different naming conventions.
 
+## Trend Comparison Summary
+
+If ran with comparison mode, can compare and evaluate the trend between the data in two files.
+
+There will be a trend comparison summary added to the executive summary along with the total summary of the input file.
+
+The trend comparison summary displays the file that was compared to the input file, new flagged claims, resolved claims, revenue at risk increase and decrease, and the change in revenue risk exposure.
+
 ## Validation Report
 
 If the input CSV contains invalid rows, the script creates a `validation_errors.csv` file in the `output/` folder.
@@ -40,6 +49,12 @@ If the input CSV contains invalid rows, the script creates a `validation_errors.
 The validation report includes the row number, field name, invalid value, and error message. Invalid rows are skipped, and revenue reports are generated using the valid rows only.
 
 Examples of validation issues include invalid date values, invalid money values, and missing required row values.
+
+## De-identification Mode
+
+When ran in de-identification mode, patient id's and claim id's will be masked and replaced with a fake-id.
+
+De-identification mode is meant to demo privacy-conscious masking.
 
 ## Revenue Leak Categories
 
@@ -67,6 +82,7 @@ Risk levels currently include:
 revenue_leak_project/
   data/
     sample_dental_claims.csv
+    sample_dental_claims_2.csv
   output/
     balances_over_1000.csv
     balances_overdue_past_60_days.csv
@@ -86,12 +102,14 @@ revenue_leak_project/
     main.py
     report_writer.py
     summary.py
+    trend_comparison.py
   tests/
     test_action_recommendations.py
     test_data_loader.py
     test_deidentification.py
     test_leak_categories.py
     test_summary.py
+    test_trend_comparison.py
   user_config/
     rules.json
     run_config.json
@@ -108,16 +126,22 @@ To run with default settings in `config/run_config.json`:
 python src/main.py
 ```
 
-To run with de-identification mode:
-
-```bash
-python src/main.py --input data/csv_file_name.csv --deidentify
-```
-
 To run with a specific CSV file:
 
 ```bash
 python src/main.py --input data/csv_file_name.csv 
+```
+
+To run generating trend comparison summary:
+
+```bash
+python src/main.py --input data/csv_file_name.csv --compare data/other_csv_file_name.csv
+```
+
+To run with de-identification mode:
+
+```bash
+python src/main.py --input data/csv_file_name.csv --deidentify
 ```
 
 To run with a different configuration file:
@@ -137,7 +161,9 @@ Example:
 ```json
 {
   "input_file": "data/sample_dental_claims.csv",
-  "deidentify": false
+  "compare_file": null,
+  "deidentify": false,
+  "rules_file": "user_config/rules.json"
 }
 ```
 
@@ -219,7 +245,6 @@ Optional de-identification mode masks patient and claim identifiers in generated
 Planned improvements:
 
 - Add more detailed risk scoring rules
-- Add trend comparison between report runs
 - Add more automated tests
 - Add sample executive summary output
 - Improve validation reporting for more data quality issues
