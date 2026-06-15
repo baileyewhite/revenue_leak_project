@@ -4,6 +4,8 @@ This is a Python project that reads synthetic dental claims data and identifies 
 
 The script analyzes sample patient and claim data, generates category-specific CSV reports, and prints a business-style summary to the terminal.
 
+This repository includes AI-generated synthetic sample CSV files so the project can be tested without using real patient or claims data.
+
 ## Use Case
 
 Revenue Leak Detector is designed to help identify dental claims and patient balances that may need follow-up. It analyzes CSV exports and creates prioritized reports for overdue balances, denied claims, pending insurance claims, appealed claims, and other possible revenue leaks.
@@ -312,6 +314,12 @@ Planned improvements:
 - Add sample executive summary output
 - Improve validation reporting for more data quality issues
 - Expand the local dashboard with charts, filters, and additional downloadable reports
+
+## Sample Data Notice
+
+The CSV files in the `data/` folder are AI-generated synthetic sample files created for demonstration and testing purposes.
+
+They do not contain real patient information, real claim records, or real insurance data. This project should only be used with synthetic, sample, or properly masked data.
 
 ## Important Notes
 - This project uses fake sample patient data for current testing. Real patient data should not be committed to Git.
