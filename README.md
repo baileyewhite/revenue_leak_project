@@ -29,8 +29,8 @@ Revenue Leak Detector is designed to help identify dental claims and patient bal
 - Supports optional identifier masking mode to mask patient and claim identifiers in generated reports
 - Supports flexible column mapping for alternate CSV header names
 - Provides user-friendly error handling for missing files, missing columns, invalid dates, and invalid money values
-- Includes automated testing for full workflow, data loading, revenue leak logic, recommended actions, trend comparison, breakdown summaries, de-identification, and summary calculations
-- Includes a local Streamlit dashboard with CSV upload, optional comparison upload, de-identification toggle, summary metrics, report tabs, validation results, combined report preview, and downloadable outputs
+- Includes automated testing for full workflow, data loading, revenue leak logic, recommended actions, trend comparison, breakdown summaries, identifier masking, and summary calculations
+- Includes a local Streamlit dashboard with CSV upload, optional comparison upload, identifier masking toggle, summary metrics, report tabs, validation results, combined report preview, and downloadable outputs
 
 ## Local Dashboard
 
@@ -40,7 +40,7 @@ The dashboard allows a user to:
 
 - Upload an input dental claims CSV
 - Optionally upload a comparison CSV for trend reporting
-- Enable de-identification mode with a checkbox
+- Enable identifier masking mode with a checkbox
 - View summary metric cards
 - View the executive summary
 - Preview the combined revenue leak report
@@ -53,7 +53,7 @@ To start the dashboard:
 
 ```bash
 python -m streamlit run app.py
-````
+```
 
 Then upload a CSV file through the browser interface.
 
@@ -122,6 +122,8 @@ revenue_leak_project/
   data/
     sample_dental_claims.csv
     sample_dental_claims_2.csv
+  docs/
+    example_executive_summary.md
   output/
     generated report files
   src/
@@ -191,7 +193,7 @@ To run the local dashboard:
 
 ```bash
 python -m streamlit run app.py
-````
+```
 
 ## Run Configuration
 
@@ -224,8 +226,11 @@ The script creates several files in the `output/` folder:
 - `combined_revenue_leak_report.csv`, which combines all flagged claims into one file
 - `validation_errors.csv`, which lists invalid rows that were skipped
 - `executive_summary.txt`, which saves the terminal summary in a business-readable text file
-- The local dashboard also provides download buttons for `executive_summary.txt` and `combined_revenue_leak_report.csv`.
-  - See [`docs/example_executive_summary.md`](docs/example_executive_summary.md) for an example executive summary.
+- `run_metadata.json`, which records run date, input file, validation counts, masking mode, and reports created
+
+The local dashboard also provides download buttons for `executive_summary.txt` and `combined_revenue_leak_report.csv`.
+
+See [`docs/example_executive_summary.md`](docs/example_executive_summary.md) for an example executive summary.
 
 ## Dependencies
 
@@ -247,7 +252,7 @@ Run the test suite from the project folder:
 python -m pytest
 ```
 
-The tests currently check full workflow, CSV parsing, flexible column mapping, revenue leak category logic, summary calculations, de-identification, recommended actions, trend comparison, and breakdown summaries.
+The tests currently check full workflow, CSV parsing, flexible column mapping, revenue leak category logic, summary calculations, identifier masking, recommended actions, trend comparison, and breakdown summaries.
 
 ## Input CSV Format
 
@@ -294,9 +299,9 @@ The script can recognize alternate header names, such as:
 
 ## Privacy and Data Notice
 
-This project is intended for synthetic, sample, or de-identified data only. Do not commit real patient data, claim exports, or other sensitive health information to Git.
+This project is intended for synthetic, sample, or already-masked data only. Do not commit real patient data, claim exports, or other sensitive health information to Git.
 
-Optional de-identification mode masks patient and claim identifiers in generated reports for demo purposes. This should not be treated as a legal determination that real health data has been de-identified.
+Optional identifier masking mode masks patient and claim identifiers in generated reports for demo purposes. This should not be treated as a legal determination that real health data has been de-identified.
 
 ## Limitations
 
@@ -311,7 +316,7 @@ Optional de-identification mode masks patient and claim identifiers in generated
 Planned improvements:
 
 - Add more detailed risk scoring rules
-- Add sample executive summary output
+- Add dashboard charts and filtering for risk level, payer, provider, and procedure
 - Improve validation reporting for more data quality issues
 - Expand the local dashboard with charts, filters, and additional downloadable reports
 
@@ -323,8 +328,12 @@ They do not contain real patient information, real claim records, or real insura
 
 ## Important Notes
 - This project uses fake sample patient data for current testing. Real patient data should not be committed to Git.
-- `user_config/run_config.json` should point to synthetic, sample, or de-identified data only.
+- `user_config/run_config.json` should point to synthetic, sample, or masked data only.
 - Files in the `output/` folder are generated and should not be committed to Git.
-- De-identification mode masks patient and claim identifiers for demo purposes. It should not be treated as a legal determination that real health data has been de-identified.
+- Identifier masking mode masks patient and claim identifiers for demo purposes. It should not be treated as a legal determination that real health data has been de-identified.
 - File paths are handled relative to the project folder, so the script does not depend on a specific user directory.
 - If invalid rows are found, revenue reports are generated from valid rows only.
+
+Copyright © 2026 Bailey White. All rights reserved.
+
+This project is shared publicly as a portfolio and demonstration project. No license is currently granted for commercial reuse.
