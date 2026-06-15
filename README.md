@@ -10,7 +10,7 @@ Revenue Leak Detector is designed to help identify dental claims and patient bal
 
 ## Current Features
 
-- Supports configurable run settings through `config/run_config.json`, with optional command-line overrides- 
+- Supports configurable run settings through `user_config/run_config.json`, with optional command-line overrides
 - Reads patient and claim data from a CSV file
 - Detects revenue leaks based on multiple reporting categories
 - Scores flagged claims by risk level to help prioritize follow-up
@@ -22,12 +22,12 @@ Revenue Leak Detector is designed to help identify dental claims and patient bal
   - Total unique claims flagged
   - Total unique revenue at risk
   - List of reports created
-  - A comparison trend summary (if ran with --compare command)
+  - A comparison trend summary when run with the `--compare` command
   - A breakdown summary highlighting top payers, top providers, and top procedures
 - Supports optional de-identification mode to mask patient and claim identifiers in generated reports
 - Supports flexible column mapping for alternate CSV header names
 - Provides user-friendly error handling for missing files, missing columns, invalid dates, and invalid money values
-- Includes automated testing for data loading, revenue leak logic, and summary calculations
+- Includes automated testing for data loading, revenue leak logic, recommended actions, trend comparison, breakdown summaries, de-identification, and summary calculations
 
 ## Flexible Column Mapping
 
@@ -37,11 +37,11 @@ This makes the tool more flexible for CSV files that use different naming conven
 
 ## Trend Comparison Summary
 
-If ran with comparison mode, can compare and evaluate the trend between the data in two files.
+When run in comparison mode, the tool compares two CSV files and summarizes changes in flagged claims and revenue risk exposure.
 
 There will be a trend comparison summary added to the executive summary along with the total summary of the input file.
 
-The trend comparison summary displays the file that was compared to the input file, new flagged claims, resolved claims, revenue at risk increase and decrease, and the change in revenue risk exposure.
+The trend comparison summary compares the input file against another CSV file and shows new flagged claims, resolved claims, revenue risk increases, revenue risk decreases, and net change in revenue risk exposure.
 
 ## Breakdown Summary
 
@@ -61,7 +61,7 @@ Examples of validation issues include invalid date values, invalid money values,
 
 ## De-identification Mode
 
-When ran in de-identification mode, patient id's and claim id's will be masked and replaced with a fake-id.
+When run in de-identification mode, patient IDs and claim IDs are masked and replaced with fake identifiers.
 
 De-identification mode is meant to demo privacy-conscious masking.
 
@@ -93,15 +93,7 @@ revenue_leak_project/
     sample_dental_claims.csv
     sample_dental_claims_2.csv
   output/
-    balances_over_1000.csv
-    balances_overdue_past_60_days.csv
-    combined_revenue_leak_report.csv
-    denied_insurance_claims.csv
-    executive_summary.txt
-    old_submitted_claims.csv
-    pending_insurance_claims.csv
-    unresolved_appealed_claims.csv
-    validation_errors.csv
+    generated report files
   src/
     action_recommendations.py
     breakdowns.py
@@ -131,7 +123,7 @@ revenue_leak_project/
 
 ## How to Run
 
-To run with default settings in `config/run_config.json`:
+To run with default settings in `user_config/run_config.json`:
 
 ```bash
 python src/main.py
@@ -143,7 +135,7 @@ To run with a specific CSV file:
 python src/main.py --input data/csv_file_name.csv 
 ```
 
-To run generating trend comparison summary:
+To generate a trend comparison summary:
 
 ```bash
 python src/main.py --input data/csv_file_name.csv --compare data/other_csv_file_name.csv
@@ -158,14 +150,14 @@ python src/main.py --input data/csv_file_name.csv --deidentify
 To run with a different configuration file:
 
 ```bash
-python src/main.py --config config/run_config.json
+python src/main.py --config user_config/run_config.json
 ```
 
 - The script will print a business report summary to the terminal and create multiple category-specific CSV and text outputs in the `output/` folder.
 
 ## Run Configuration
 
-The project includes a `config/run_config.json` file for default run settings.
+The project includes a `user_config/run_config.json` file for default run settings.
 
 Example:
 
@@ -178,7 +170,11 @@ Example:
 }
 ```
 
-The input_file value controls which CSV file is analyzed by default. The deidentify value controls whether patient and claim identifiers are masked in generated reports.
+The `input_file` value controls which CSV file is analyzed by default. 
+
+The `deidentify` value controls whether patient and claim identifiers are masked in generated reports.
+
+The `compare_file` value can be used to provide a default comparison CSV for trend reporting.
 
 Command-line arguments can override these defaults for a single run.
 
@@ -207,7 +203,7 @@ Run the test suite from the project folder:
 python -m pytest
 ```
 
-The tests currently check CSV parsing, flexible column mapping, revenue leak category logic, and unique revenue exposure calculations.
+The tests currently check CSV parsing, flexible column mapping, revenue leak category logic, summary calculations, de-identification, recommended actions, trend comparison, and breakdown summaries.
 
 ## Input CSV Format
 
@@ -223,6 +219,17 @@ The input CSV should contain claim-level rows with the following required fields
 | total_balance | Total outstanding balance |
 | claim_status | Current claim status |
 
+### Optional Fields
+
+The following fields are optional, but enable richer breakdown reporting:
+
+| Field | Description |
+|---|---|
+| payer | Insurance payer name |
+| provider | Rendering provider name |
+| procedure_code_description | Procedure code or procedure description |
+| location | Office or clinic location, if available |
+
 ## Supported Column Aliases
 
 The script can recognize alternate header names, such as:
@@ -236,6 +243,10 @@ The script can recognize alternate header names, such as:
 | insurance_balance | `insurance_balance`, `Insurance Balance`, `insurance_due` |
 | total_balance | `total_balance`, `Total Balance`, `balance`, `outstanding_balance` |
 | claim_status | `claim_status`, `Claim Status`, `status` |
+| payer | `payer`, `payer_name`, `insurance_payer` |
+| provider | `provider`, `provider_name`, `rendering_provider` |
+| procedure_code_description | `procedure_code_description`, `procedure_code`, `procedure`, `procedure_description` |
+| location | `location`, `office_location`, `clinic_location` |
 
 ## Privacy and Data Notice
 
@@ -256,14 +267,14 @@ Optional de-identification mode masks patient and claim identifiers in generated
 Planned improvements:
 
 - Add more detailed risk scoring rules
-- Add more automated tests
 - Add sample executive summary output
 - Improve validation reporting for more data quality issues
+- Add a local interactive dashboard for CSV upload, summary cards, report tables, and downloadable outputs
 
 ## Important Notes
 - This project uses fake sample patient data for current testing. Real patient data should not be committed to Git.
-- `config/run_config.json` should point to synthetic, sample, or de-identified data only.
-- Files in the `output/` folder is generated and may not be committed to Git.
+- `user_config/run_config.json` should point to synthetic, sample, or de-identified data only.
+- Files in the `output/` folder are generated and should not be committed to Git.
 - De-identification mode masks patient and claim identifiers for demo purposes. It should not be treated as a legal determination that real health data has been de-identified.
 - File paths are handled relative to the project folder, so the script does not depend on a specific user directory.
 - If invalid rows are found, revenue reports are generated from valid rows only.
