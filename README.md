@@ -221,6 +221,7 @@ The script creates several files in the `output/` folder:
 - `validation_errors.csv`, which lists invalid rows that were skipped
 - `executive_summary.txt`, which saves the terminal summary in a business-readable text file
 - The local dashboard also provides download buttons for `executive_summary.txt` and `combined_revenue_leak_report.csv`.
+  - See [`docs/example_executive_summary.md`](docs/example_executive_summary.md) for an example executive summary.
 
 ## Dependencies
 
