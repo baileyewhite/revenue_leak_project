@@ -28,6 +28,28 @@ Revenue Leak Detector is designed to help identify dental claims and patient bal
 - Supports flexible column mapping for alternate CSV header names
 - Provides user-friendly error handling for missing files, missing columns, invalid dates, and invalid money values
 - Includes automated testing for data loading, revenue leak logic, recommended actions, trend comparison, breakdown summaries, de-identification, and summary calculations
+- Includes an initial local Streamlit dashboard for CSV upload, summary metrics, executive summary display, validation warnings, and generated report paths
+
+## Local Dashboard
+
+The project includes an initial local Streamlit dashboard.
+
+The dashboard allows a user to upload a dental claims CSV file and view:
+
+- Summary metric cards
+- Executive summary output
+- Validation warnings
+- Generated report paths
+
+The dashboard runs locally and does not upload data to a cloud service.
+
+To start the dashboard:
+
+```bash
+python -m streamlit run app.py
+````
+
+Then upload a CSV file through the browser interface.
 
 ## Flexible Column Mapping
 
@@ -116,6 +138,7 @@ revenue_leak_project/
   user_config/
     rules.json
     run_config.json
+  app.py
   pytest.ini
   README.md
   requirements.txt
@@ -155,6 +178,12 @@ python src/main.py --config user_config/run_config.json
 
 - The script will print a business report summary to the terminal and create multiple category-specific CSV and text outputs in the `output/` folder.
 
+To run the local dashboard:
+
+```bash
+python -m streamlit run app.py
+````
+
 ## Run Configuration
 
 The project includes a `user_config/run_config.json` file for default run settings.
@@ -187,15 +216,19 @@ The script creates several files in the `output/` folder:
 - `validation_errors.csv`, which lists invalid rows that were skipped
 - `executive_summary.txt`, which saves the terminal summary in a business-readable text file
 
-## Running Tests
+## Dependencies
 
-This project uses `pytest` for automated testing.
+This project currently uses `pytest`, `pandas`, and `streamlit`.
 
 Install project dependencies:
 
 ```bash
 python -m pip install -r requirements.txt
 ```
+
+## Running Tests
+
+This project uses `pytest` for automated testing.
 
 Run the test suite from the project folder:
 
@@ -269,7 +302,7 @@ Planned improvements:
 - Add more detailed risk scoring rules
 - Add sample executive summary output
 - Improve validation reporting for more data quality issues
-- Add a local interactive dashboard for CSV upload, summary cards, report tables, and downloadable outputs
+- Expand the local dashboard with report tables, download buttons, trend comparison upload, and richer visual summaries
 
 ## Important Notes
 - This project uses fake sample patient data for current testing. Real patient data should not be committed to Git.
