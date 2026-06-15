@@ -23,6 +23,7 @@ Revenue Leak Detector is designed to help identify dental claims and patient bal
   - Total unique revenue at risk
   - List of reports created
   - A comparison trend summary (if ran with --compare command)
+  - A breakdown summary highlighting top payers, top providers, and top procedures
 - Supports optional de-identification mode to mask patient and claim identifiers in generated reports
 - Supports flexible column mapping for alternate CSV header names
 - Provides user-friendly error handling for missing files, missing columns, invalid dates, and invalid money values
@@ -41,6 +42,14 @@ If ran with comparison mode, can compare and evaluate the trend between the data
 There will be a trend comparison summary added to the executive summary along with the total summary of the input file.
 
 The trend comparison summary displays the file that was compared to the input file, new flagged claims, resolved claims, revenue at risk increase and decrease, and the change in revenue risk exposure.
+
+## Breakdown Summary
+
+The breakdown summary is printed on the executive summary to highlight top payers, providers, and procedures.
+
+Currently, the breakdown summary shows the top payer by denied insurance balance, top provider by total revenue at risk, and the top procedure type by total revenue at risk.
+
+The breakdown summary is a useful tool for providing management insight and answering business questions.
 
 ## Validation Report
 
@@ -95,6 +104,7 @@ revenue_leak_project/
     validation_errors.csv
   src/
     action_recommendations.py
+    breakdowns.py
     config.py
     data_loader.py
     deidentification.py
@@ -105,6 +115,7 @@ revenue_leak_project/
     trend_comparison.py
   tests/
     test_action_recommendations.py
+    test_breakdowns.py
     test_data_loader.py
     test_deidentification.py
     test_leak_categories.py

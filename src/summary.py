@@ -104,7 +104,6 @@ def total_summary(data, validation_errors):
 
     return summary_lines
 
-
 def calculate_unique_claim_exposure(reports):
     seen_claims = set()
     total_exposure = 0

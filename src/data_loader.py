@@ -1,4 +1,4 @@
-from config import TODAY, COLUMN_ALIASES
+from config import TODAY, REQUIRED_COLUMN_ALIASES, OPTIONAL_COLUMN_ALIASES
 import csv
 from datetime import date
 
@@ -102,6 +102,22 @@ def read_csv_patient_data(file_path):
                 })
                 row_has_error = True
 
+            payer = ""
+            if "payer" in column_map:
+                payer = row.get(column_map.get("payer"), "").strip()
+
+            provider = ""
+            if "provider" in column_map:
+                provider = row.get(column_map.get("provider"), "").strip()
+
+            procedure_code_description = ""
+            if "procedure_code_description" in column_map:
+                procedure_code_description = row.get(
+                    column_map["procedure_code_description"],
+                    ""
+                ).strip()
+
+
             if row_has_error:
                 continue
 
@@ -114,7 +130,10 @@ def read_csv_patient_data(file_path):
                 "patient_balance": patient_balance,
                 "insurance_balance": insurance_balance,
                 "total_balance": total_balance,
-                "claim_status": claim_status
+                "claim_status": claim_status,
+                "payer": payer,
+                "provider": provider,
+                "procedure_code_description": procedure_code_description
             }
 
     return patient_data, validation_errors
@@ -137,16 +156,43 @@ def find_column(headers, possible_names):
 def map_columns(headers):
     column_map = {}
 
-    for standard_name, possible_names in COLUMN_ALIASES.items():
-        actual_column = find_column(headers, possible_names)
+    normalized_headers = {
+        normalize_header(header): header
+        for header in headers
+    }
 
-        if actual_column is None:
+    # Required columns: missing one should stop the program.
+    for standard_name, possible_names in REQUIRED_COLUMN_ALIASES.items():
+        found_column = None
+
+        for possible_name in possible_names:
+            normalized_name = normalize_header(possible_name)
+
+            if normalized_name in normalized_headers:
+                found_column = normalized_headers[normalized_name]
+                break
+
+        if found_column is None:
             raise ValueError(
                 f"Missing required column for: {standard_name}. "
                 f"Accepted names are: {possible_names}"
             )
 
-        column_map[standard_name] = actual_column
+        column_map[standard_name] = found_column
+
+    # Optional columns: include them if found, otherwise skip them.
+    for standard_name, possible_names in OPTIONAL_COLUMN_ALIASES.items():
+        found_column = None
+
+        for possible_name in possible_names:
+            normalized_name = normalize_header(possible_name)
+
+            if normalized_name in normalized_headers:
+                found_column = normalized_headers[normalized_name]
+                break
+
+        if found_column is not None:
+            column_map[standard_name] = found_column
 
     return column_map
 

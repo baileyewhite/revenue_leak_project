@@ -16,7 +16,7 @@ CONFIG_DIR = BASE_DIR / "user_config"
 DEFAULT_RUN_CONFIG_PATH = CONFIG_DIR / "run_config.json"
 DEFAULT_RULES_PATH = CONFIG_DIR / "rules.json"
 
-COLUMN_ALIASES = {
+REQUIRED_COLUMN_ALIASES = {
     "patient_id": ["patient_id", "Patient ID", "patient_number", "account_number"],
     "claim_id": ["claim_id", "Claim ID", "claim_number", "encounter_id"],
     "service_date": ["service_date", "last_service_date", "date_of_service", "DOS"],
@@ -24,4 +24,16 @@ COLUMN_ALIASES = {
     "insurance_balance": ["insurance_balance", "Insurance Balance", "insurance_due"],
     "total_balance": ["total_balance", "Total Balance", "balance", "outstanding_balance"],
     "claim_status": ["claim_status", "Claim Status", "status"]
+}
+
+OPTIONAL_COLUMN_ALIASES = {
+    "payer": ["payer", "payer_name", "insurance_payer"],
+    "provider": ["provider", "provider_name", "rendering_provider"],
+    "procedure_code_description": [
+            "procedure_code_description",
+            "procedure_code",
+            "procedure",
+            "procedure_description",
+            "Procedure Code Description"
+        ],
 }

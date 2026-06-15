@@ -4,15 +4,11 @@ def add_claim_to_report(report, patient_id, claim_id, claim_info):
     if patient_id not in report:
         report[patient_id] = {}
 
-    report[patient_id][claim_id] = {
-        "patient_balance": claim_info["patient_balance"],
-        "insurance_balance": claim_info["insurance_balance"],
-        "total_balance": claim_info["total_balance"],
-        "service_date": claim_info["service_date"],
-        "days_past": claim_info["days_past"],
-        "claim_status": claim_info["claim_status"],
-        "risk_level": risk_level(claim_info)
-    }
+    claim_info_copy = claim_info.copy()
+
+    claim_info_copy['risk_level'] = risk_level(claim_info_copy)
+
+    report[patient_id][claim_id] = claim_info_copy
 
 def risk_level(claim_info):
     total_balance = claim_info['total_balance']

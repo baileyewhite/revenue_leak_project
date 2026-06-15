@@ -1,5 +1,6 @@
 from data_loader import read_csv_patient_data
 from summary import total_summary
+from breakdowns import breakdown_summary
 from report_writer import write_validation_errors_to_csv, write_executive_summary
 from deidentification import deidentify_patient_data
 from config import BASE_DIR, DEFAULT_RUN_CONFIG_PATH
@@ -109,6 +110,9 @@ if __name__ == '__main__':
 
         if patient_data:
             summary_lines = total_summary(patient_data, validation_errors)
+
+            breakdown_lines = breakdown_summary(patient_data)
+            summary_lines.extend(breakdown_lines)
 
             if comparison_lines:
                 summary_lines.extend(comparison_lines)
