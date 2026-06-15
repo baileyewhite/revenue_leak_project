@@ -28,18 +28,22 @@ Revenue Leak Detector is designed to help identify dental claims and patient bal
 - Supports flexible column mapping for alternate CSV header names
 - Provides user-friendly error handling for missing files, missing columns, invalid dates, and invalid money values
 - Includes automated testing for data loading, revenue leak logic, recommended actions, trend comparison, breakdown summaries, de-identification, and summary calculations
-- Includes an initial local Streamlit dashboard for CSV upload, summary metrics, executive summary display, validation warnings, and generated report paths
+- Includes a local Streamlit dashboard with CSV upload, optional comparison upload, de-identification toggle, summary metrics, report tabs, validation results, combined report preview, and downloadable outputs
 
 ## Local Dashboard
 
-The project includes an initial local Streamlit dashboard.
+The project includes a local Streamlit dashboard.
 
-The dashboard allows a user to upload a dental claims CSV file and view:
+The dashboard allows a user to:
 
-- Summary metric cards
-- Executive summary output
-- Validation warnings
-- Generated report paths
+- Upload an input dental claims CSV
+- Optionally upload a comparison CSV for trend reporting
+- Enable de-identification mode with a checkbox
+- View summary metric cards
+- View the executive summary
+- Preview the combined revenue leak report
+- Review validation warnings
+- Download the executive summary and combined report
 
 The dashboard runs locally and does not upload data to a cloud service.
 
@@ -215,6 +219,7 @@ The script creates several files in the `output/` folder:
 - `combined_revenue_leak_report.csv`, which combines all flagged claims into one file
 - `validation_errors.csv`, which lists invalid rows that were skipped
 - `executive_summary.txt`, which saves the terminal summary in a business-readable text file
+- The local dashboard also provides download buttons for `executive_summary.txt` and `combined_revenue_leak_report.csv`.
 
 ## Dependencies
 
@@ -302,7 +307,7 @@ Planned improvements:
 - Add more detailed risk scoring rules
 - Add sample executive summary output
 - Improve validation reporting for more data quality issues
-- Expand the local dashboard with report tables, download buttons, trend comparison upload, and richer visual summaries
+- Expand the local dashboard with charts, filters, and additional downloadable reports
 
 ## Important Notes
 - This project uses fake sample patient data for current testing. Real patient data should not be committed to Git.
