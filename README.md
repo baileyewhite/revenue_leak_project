@@ -57,6 +57,20 @@ python -m streamlit run app.py
 
 Then upload a CSV file through the browser interface.
 
+## Dashboard Preview
+
+### Upload screen
+
+![Dashboard upload screen](docs/images/dashboard_upload.png)
+
+### Executive summary and metrics
+
+![Dashboard summary view](docs/images/dashboard_summary.png)
+
+### Combined report preview
+
+![Combined report preview](docs/images/combined_report_preview.png)
+
 ## Flexible Column Mapping
 
 The script can recognize multiple possible header names for required CSV fields. For example, the service date column can be named `service_date`, `last_service_date`, `date_of_service`, or `DOS`.
