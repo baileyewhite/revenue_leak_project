@@ -190,31 +190,174 @@ if results is not None:
     metric_col2.metric("Revenue at Risk", results["total_revenue_at_risk"])
     metric_col3.metric("Validation Errors", results["total_validation_errors"])
 
-    summary_tab, combined_tab, validation_tab, downloads_tab = st.tabs(
+    selected_view = st.segmented_control(
+        "Report view",
         [
             "Executive Summary",
             "Combined Report",
             "Validation",
             "Downloads"
-        ]
+        ],
+        default="Executive Summary",
+        label_visibility="collapsed",
+        key="selected_report_view"
     )
 
-    with summary_tab:
+    if selected_view == "Executive Summary":
         st.subheader("Executive Summary")
         st.text("\n".join(results["summary_lines"]))
 
-    with combined_tab:
+    elif selected_view == "Combined Report":
         st.subheader("Combined Revenue Leak Report")
 
         combined_report_path = results["combined_report_path"]
 
         if combined_report_path.exists():
             combined_df = pd.read_csv(combined_report_path)
-            st.dataframe(combined_df, use_container_width=True)
+
+            filtered_df = combined_df.copy()
+
+            if "total_balance" in filtered_df.columns:
+                filtered_df["total_balance"] = pd.to_numeric(
+                    filtered_df["total_balance"],
+                    errors="coerce"
+                ).fillna(0)
+
+            st.markdown("### Filters")
+
+            filter_col1, filter_col2, filter_col3 = st.columns(3)
+
+            with filter_col1:
+                if "risk_level" in combined_df.columns:
+                    selected_risk_levels = st.multiselect(
+                        "Risk level",
+                        sorted(combined_df["risk_level"].dropna().astype(str).unique())
+                    )
+
+                    if selected_risk_levels:
+                        filtered_df = filtered_df[
+                            filtered_df["risk_level"].astype(str).isin(selected_risk_levels)
+                        ]
+
+                if "claim_status" in combined_df.columns:
+                    selected_claim_statuses = st.multiselect(
+                        "Claim status",
+                        sorted(combined_df["claim_status"].dropna().astype(str).unique())
+                    )
+
+                    if selected_claim_statuses:
+                        filtered_df = filtered_df[
+                            filtered_df["claim_status"].astype(str).isin(selected_claim_statuses)
+                        ]
+
+            with filter_col2:
+                if "category_type" in combined_df.columns:
+                    selected_categories = st.multiselect(
+                        "Revenue leak category",
+                        sorted(combined_df["category_type"].dropna().astype(str).unique())
+                    )
+
+                    if selected_categories:
+                        filtered_df = filtered_df[
+                            filtered_df["category_type"].astype(str).isin(selected_categories)
+                        ]
+
+                if "payer" in combined_df.columns:
+                    selected_payers = st.multiselect(
+                        "Payer",
+                        sorted(combined_df["payer"].dropna().astype(str).unique())
+                    )
+
+                    if selected_payers:
+                        filtered_df = filtered_df[
+                            filtered_df["payer"].astype(str).isin(selected_payers)
+                        ]
+
+            with filter_col3:
+                if "provider" in combined_df.columns:
+                    selected_providers = st.multiselect(
+                        "Provider",
+                        sorted(combined_df["provider"].dropna().astype(str).unique())
+                    )
+
+                    if selected_providers:
+                        filtered_df = filtered_df[
+                            filtered_df["provider"].astype(str).isin(selected_providers)
+                        ]
+
+                if "total_balance" in combined_df.columns:
+                    min_balance = float(combined_df["total_balance"].min())
+                    max_balance = float(combined_df["total_balance"].max())
+
+                    if min_balance < max_balance:
+                        selected_balance_range = st.slider(
+                            "Total balance range",
+                            min_value=min_balance,
+                            max_value=max_balance,
+                            value=(min_balance, max_balance),
+                            step=50.0
+                        )
+
+                        filtered_df = filtered_df[
+                            (filtered_df["total_balance"] >= selected_balance_range[0])
+                            & (filtered_df["total_balance"] <= selected_balance_range[1])
+                            ]
+
+            search_text = st.text_input(
+                "Search combined report",
+                placeholder="Search patient ID, claim ID, payer, provider, procedure, action..."
+            )
+
+            if search_text:
+                searchable_columns = [
+                    "patient_id",
+                    "claim_id",
+                    "payer",
+                    "provider",
+                    "procedure_code_description",
+                    "recommended_action",
+                    "priority_reason",
+                    "category_statement",
+                ]
+
+                existing_searchable_columns = [
+                    column
+                    for column in searchable_columns
+                    if column in filtered_df.columns
+                ]
+
+                search_mask = filtered_df[existing_searchable_columns].astype(str).apply(
+                    lambda row: row.str.contains(
+                        search_text,
+                        case=False,
+                        na=False
+                    ).any(),
+                    axis=1
+                )
+
+                filtered_df = filtered_df[search_mask]
+
+            st.markdown("### Filtered Results")
+
+            st.caption(
+                f"Showing {len(filtered_df)} of {len(combined_df)} combined report rows."
+            )
+
+            st.dataframe(filtered_df, use_container_width=True)
+
+            filtered_csv = filtered_df.to_csv(index=False).encode("utf-8")
+
+            st.download_button(
+                label="Download Filtered Combined Report",
+                data=filtered_csv,
+                file_name="filtered_combined_revenue_leak_report.csv",
+                mime="text/csv"
+            )
+
         else:
             st.warning("Combined report was not found.")
 
-    with validation_tab:
+    elif selected_view == "Validation":
         st.subheader("Validation Results")
 
         if results["validation_errors"]:
@@ -238,7 +381,7 @@ if results is not None:
             else:
                 st.success("No validation errors found in the comparison file.")
 
-    with downloads_tab:
+    elif selected_view == "Downloads":
         st.subheader("Downloads")
 
         display_download_button(

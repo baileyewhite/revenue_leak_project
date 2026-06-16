@@ -10,6 +10,13 @@ This repository includes AI-generated synthetic sample CSV files so the project 
 
 Revenue Leak Detector is designed to help identify dental claims and patient balances that may need follow-up. It analyzes CSV exports and creates prioritized reports for overdue balances, denied claims, pending insurance claims, appealed claims, and other possible revenue leaks.
 
+## Technical Highlights
+
+- Built a modular Python workflow for CSV validation, rule-based detection, report generation, and dashboard display
+- Added automated tests for unit-level logic and full workflow behavior
+- Used Streamlit to create a local dashboard for non-technical users
+- Added identifier masking and synthetic-data boundaries to avoid unsafe healthcare-data assumptions
+
 ## Current Features
 
 - Supports configurable run settings through `user_config/run_config.json`, with optional command-line overrides
@@ -46,6 +53,7 @@ The dashboard allows a user to:
 - Preview the combined revenue leak report
 - Review validation warnings
 - Download the executive summary and combined report
+- Filter the combined report by risk level, claim status, category, payer, provider, balance range, and search text
 
 The dashboard runs locally and does not upload data to a cloud service.
 
@@ -322,8 +330,10 @@ Optional identifier masking mode masks patient and claim identifiers in generate
 - The tool currently analyzes CSV files only.
 - Date values are expected in `YYYY-MM-DD` format.
 - Risk scoring rules are simple rule-based thresholds.
-- The project does not connect directly to dental practice management systems.
-- The project is not a replacement for professional billing review or compliance review.
+- This is a local prototype and does not connect directly to practice management systems.
+- The tool does not claim HIPAA compliance.
+- Revenue leak rules are simple configurable heuristics, not machine learning or billing-policy validation.
+- Sample data is synthetic and does not represent real claim outcomes.
 
 ## Roadmap
 
