@@ -52,7 +52,7 @@ The dashboard allows a user to:
 - View the executive summary
 - Preview the combined revenue leak report
 - Review validation warnings
-- Download the executive summary and combined report
+- Download all generated reports
 - Filter the combined report by risk level, claim status, category, payer, provider, balance range, and search text
 - View dashboard charts for risk levels, revenue leak categories, payers, and providers
 
@@ -255,7 +255,7 @@ The script creates several files in the `output/` folder:
 - `executive_summary.txt`, which saves the terminal summary in a business-readable text file
 - `run_metadata.json`, which records run date, input file, validation counts, masking mode, and reports created
 
-The local dashboard also provides download buttons for `executive_summary.txt` and `combined_revenue_leak_report.csv`.
+The local dashboard provides download buttons for all generated reports, including category-specific CSV reports, the combined report, validation report, executive summary, and run metadata file when available.
 
 See [`docs/example_executive_summary.md`](docs/example_executive_summary.md) for an example executive summary.
 

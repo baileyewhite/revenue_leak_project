@@ -12,7 +12,7 @@ from summary import total_summary, report_paths_summary
 from breakdowns import breakdown_summary
 from trend_comparison import generate_report_comparison
 from deidentification import deidentify_patient_data
-from report_writer import write_executive_summary, write_run_metadata
+from report_writer import write_executive_summary, write_run_metadata, write_validation_errors_to_csv
 
 
 UPLOAD_DIR = BASE_DIR / "output" / "dashboard_uploads"
@@ -36,16 +36,30 @@ def get_summary_value(summary_lines, prefix):
     return "N/A"
 
 
-def display_download_button(file_path, label, file_name):
+def get_mime_type(file_path):
+    file_path = Path(file_path)
+
+    if file_path.suffix == ".csv":
+        return "text/csv"
+    if file_path.suffix == ".txt":
+        return "text/plain"
+    if file_path.suffix == ".json":
+        return "application/json"
+
+    return "application/octet-stream"
+
+
+def display_download_button(file_path, label=None):
     file_path = Path(file_path)
 
     if file_path.exists():
-        with open(file_path, "rb") as file:
-            st.download_button(
-                label=label,
-                data=file,
-                file_name=file_name,
-            )
+        st.download_button(
+            label=label or f"Download {file_path.name}",
+            data=file_path.read_bytes(),
+            file_name=file_path.name,
+            mime=get_mime_type(file_path),
+            key=f"download_{file_path.name}"
+        )
 
 CATEGORY_LABELS = {
     "balances_overdue_past_60_days": "Patient balances overdue 60 days",
@@ -285,6 +299,14 @@ elif run_analysis:
             validation_errors,
             input_path=input_path
         )
+
+        all_validation_errors = validation_errors + compare_validation_errors
+
+        validation_errors_path = None
+
+        if all_validation_errors:
+            validation_errors_path = write_validation_errors_to_csv(all_validation_errors)
+            output_paths.append(validation_errors_path)
 
         breakdown_lines = breakdown_summary(patient_data)
         summary_lines.extend(breakdown_lines)
@@ -559,23 +581,56 @@ if results is not None:
             else:
                 st.success("No validation errors found in the comparison file.")
 
+
     elif selected_view == "Downloads":
+
         st.subheader("Downloads")
 
-        display_download_button(
-            results["executive_summary_path"],
-            "Download Executive Summary",
-            "executive_summary.txt"
-        )
+        downloadable_paths = []
 
-        display_download_button(
-            results["combined_report_path"],
-            "Download Combined Revenue Leak Report",
-            "combined_revenue_leak_report.csv"
-        )
-
-        st.subheader("Generated Report Paths")
+        if results["executive_summary_path"]:
+            downloadable_paths.append(Path(results["executive_summary_path"]))
 
         for output_path in results["output_paths"]:
-            relative_path = str(Path(output_path).relative_to(BASE_DIR)).replace("\\", "/")
-            st.write(relative_path)
+            downloadable_paths.append(Path(output_path))
+
+        # Remove duplicates while preserving order
+
+        unique_downloadable_paths = []
+
+        seen_paths = set()
+
+        for file_path in downloadable_paths:
+
+            normalized_path = str(file_path.resolve())
+
+            if normalized_path not in seen_paths:
+                seen_paths.add(normalized_path)
+
+                unique_downloadable_paths.append(file_path)
+
+        if not unique_downloadable_paths:
+
+            st.info("No generated reports are available for download.")
+
+
+        else:
+
+            for file_path in unique_downloadable_paths:
+
+                if file_path.exists():
+                    relative_path = str(file_path.relative_to(BASE_DIR)).replace("\\", "/")
+
+                    file_col, button_col = st.columns([3, 2])
+
+                    with file_col:
+                        st.write(f"`{relative_path}`")
+
+                    with button_col:
+                        display_download_button(
+
+                            file_path,
+
+                            f"Download {file_path.name}"
+
+                        )
