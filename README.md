@@ -151,6 +151,12 @@ revenue_leak_project/
     sample_dental_claims.csv
     sample_dental_claims_2.csv
   docs/
+    images/
+        combined_report_preview.png
+        dashboard_charts.png
+        dashboard_summary.png
+        dashboard_upload.png
+        downloads_tabs.png
     example_executive_summary.md
   output/
     generated report files
@@ -165,6 +171,7 @@ revenue_leak_project/
     report_writer.py
     summary.py
     trend_comparison.py
+    workflow.py
   tests/
     test_action_recommendations.py
     test_breakdowns.py
@@ -174,6 +181,7 @@ revenue_leak_project/
     test_leak_categories.py
     test_summary.py
     test_trend_comparison.py
+    test_workflow.py
   user_config/
     rules.json
     run_config.json
