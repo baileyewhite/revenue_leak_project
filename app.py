@@ -7,13 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent
 SRC_DIR = BASE_DIR / "src"
 sys.path.append(str(SRC_DIR))
 
-from data_loader import read_csv_patient_data
-from summary import total_summary, report_paths_summary
-from breakdowns import breakdown_summary
-from trend_comparison import generate_report_comparison
-from deidentification import deidentify_patient_data
-from report_writer import write_executive_summary, write_run_metadata, write_validation_errors_to_csv
-
+from workflow import run_revenue_leak_analysis
 
 UPLOAD_DIR = BASE_DIR / "output" / "dashboard_uploads"
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
@@ -36,15 +30,6 @@ def save_uploaded_file(uploaded_file, file_name):
 
     return file_path
 
-
-def get_summary_value(summary_lines, prefix):
-    for line in summary_lines:
-        if line.startswith(prefix):
-            return line.replace(prefix, "").strip()
-
-    return "N/A"
-
-
 def get_mime_type(file_path):
     file_path = Path(file_path)
 
@@ -56,7 +41,6 @@ def get_mime_type(file_path):
         return "application/json"
 
     return "application/octet-stream"
-
 
 def display_download_button(file_path, label=None):
     file_path = Path(file_path)
@@ -325,11 +309,9 @@ elif run_analysis:
     else:
         input_path = save_uploaded_file(uploaded_file, "dashboard_input.csv")
 
-    patient_data, validation_errors = read_csv_patient_data(input_path)
-
     compare_path = None
-    compare_validation_errors = []
-    comparison_lines = []
+    #compare_validation_errors = []
+    #comparison_lines = []
 
     if compare_source == COMPARE_SAMPLE:
         compare_path = SAMPLE_COMPARE_PATH
@@ -337,91 +319,18 @@ elif run_analysis:
     elif compare_source == COMPARE_UPLOAD:
         compare_path = save_uploaded_file(compare_file, "dashboard_compare.csv")
 
-    if compare_path is not None:
-        compare_data, compare_validation_errors = read_csv_patient_data(compare_path)
+    results = run_revenue_leak_analysis(
+        input_path=input_path,
+        compare_path=compare_path,
+        mask_identifiers=deidentify,
+    )
 
-        comparison_lines = generate_report_comparison(
-            input_report=patient_data,
-            compare_report=compare_data,
-            compare_path=compare_path
-        )
-
-    if not patient_data:
+    if not results["success"]:
         st.session_state.analysis_results = None
-        st.error("No valid rows found. Reports were not generated.")
-
+        st.error(results["message"])
     else:
-        if deidentify:
-            patient_data = deidentify_patient_data(patient_data)
-
-        summary_lines, output_paths = total_summary(
-            patient_data,
-            validation_errors,
-            input_path=input_path
-        )
-
-        breakdown_lines = breakdown_summary(patient_data)
-        summary_lines.extend(breakdown_lines)
-
-        if comparison_lines:
-            summary_lines.extend(comparison_lines)
-
-        valid_claims_analyzed = sum(
-            len(claims)
-            for claims in patient_data.values()
-        )
-
-        invalid_rows_skipped = len({
-            error["row_number"]
-            for error in validation_errors
-        })
-
-        metadata = {
-            "run_date": str(pd.Timestamp.today().date()),
-            "input_file": str(input_path.relative_to(BASE_DIR)).replace("\\", "/"),
-            "comparison_file": str(compare_path.relative_to(BASE_DIR)).replace("\\", "/") if compare_path else None,
-            "valid_claims_analyzed": valid_claims_analyzed,
-            "invalid_rows_skipped": invalid_rows_skipped,
-            "validation_errors": len(validation_errors) + len(compare_validation_errors),
-            "identifier_masking_enabled": deidentify,
-            "reports_created": len(output_paths) + 2,
-        }
-        
-        metadata_path = write_run_metadata(metadata)
-        output_paths.append(metadata_path)
-
-        report_path_lines = report_paths_summary(output_paths)
-        summary_lines.extend(report_path_lines)
-
-        executive_summary_path = write_executive_summary(summary_lines)
-
-        total_claims_flagged = get_summary_value(
-            summary_lines,
-            "Total unique claims flagged:"
-        )
-
-        total_revenue_at_risk = get_summary_value(
-            summary_lines,
-            "Total unique revenue at risk:"
-        )
-
-        total_validation_errors = len(validation_errors) + len(compare_validation_errors)
-
-        st.session_state.analysis_results = {
-            "summary_lines": summary_lines,
-            "output_paths": output_paths,
-            "validation_errors": validation_errors,
-            "compare_validation_errors": compare_validation_errors,
-            "executive_summary_path": executive_summary_path,
-            "combined_report_path": BASE_DIR / "output" / "combined_revenue_leak_report.csv",
-            "total_claims_flagged": total_claims_flagged,
-            "total_revenue_at_risk": total_revenue_at_risk,
-            "total_validation_errors": total_validation_errors,
-            "has_compare_file": compare_path is not None,
-        }
-
-        st.success("Analysis complete.")
-
+        st.session_state.analysis_results = results
+        st.success(results["message"])
 
 results = st.session_state.analysis_results
 

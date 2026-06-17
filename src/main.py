@@ -1,10 +1,5 @@
-from data_loader import read_csv_patient_data
-from summary import total_summary, report_paths_summary, format_relative_path
-from breakdowns import breakdown_summary
-from report_writer import write_validation_errors_to_csv, write_executive_summary, write_run_metadata
-from deidentification import deidentify_patient_data
-from config import BASE_DIR, DEFAULT_RUN_CONFIG_PATH, TODAY
-from trend_comparison import generate_report_comparison
+from config import BASE_DIR, DEFAULT_RUN_CONFIG_PATH
+from workflow import run_revenue_leak_analysis
 from pathlib import Path
 import argparse
 import json
@@ -74,79 +69,26 @@ if __name__ == '__main__':
             compare_path = Path(args.compare)
 
             if not compare_path.is_absolute():
-                compare_path = BASE_DIR / args.compare
+                compare_path = BASE_DIR / compare_path
 
         if args.deidentify:
             deidentify = True
 
-        patient_data, validation_errors = read_csv_patient_data(input_path)
+        results = run_revenue_leak_analysis(
+            input_path=input_path,
+            compare_path=compare_path,
+            mask_identifiers=deidentify,
+        )
 
-        comparison_lines = []
-
-        if compare_path:
-            comparing, comparing_validation_errors = read_csv_patient_data(compare_path)
-            validation_errors.extend(comparing_validation_errors)
-
-            comparison_lines = generate_report_comparison(
-                input_report=patient_data,
-                compare_report=comparing,
-                compare_path=compare_path,
-            )
-
-        if deidentify:
-            patient_data = deidentify_patient_data(patient_data)
-
-        if validation_errors:
-            errors_output_path = write_validation_errors_to_csv(validation_errors)
-            invalid_rows = len({error['row_number'] for error in validation_errors})
-            total_errors = len(validation_errors)
-
-            print("VALIDATION ERRORS WARNING!")
-            print("-------------------------")
-            print(f"In your data file, there were:")
-            print(f"{total_errors} errors on {invalid_rows} skipped invalid rows")
-            print(f"See: {errors_output_path}")
-            print()
-
-        if patient_data:
-            summary_lines, output_paths = total_summary(patient_data, validation_errors, input_path=input_path)
-
-            breakdown_lines = breakdown_summary(patient_data)
-            summary_lines.extend(breakdown_lines)
-
-            if comparison_lines:
-                summary_lines.extend(comparison_lines)
-
-            for line in comparison_lines:
-                print(line)
-
-            metadata = {
-                "run_date": str(TODAY),
-                "input_file": str(format_relative_path(input_path)).replace("\\", "/"),
-                "comparison_file": str(format_relative_path(compare_path)).replace("\\", "/") if compare_path else None,
-                "valid_claims_analyzed": sum(len(claims) for claims in patient_data.values()),
-                "invalid_rows_skipped": len({error["row_number"] for error in validation_errors}),
-                "validation_errors": len(validation_errors),
-                "identifier_masking_enabled": deidentify,
-                "reports_created": len(output_paths),
-            }
-
-            metadata_path = write_run_metadata(metadata)
-            output_paths.append(metadata_path)
-
-            report_path_lines = report_paths_summary(output_paths)
-
-            for line in report_path_lines:
-                print(line)
-
-            summary_lines.extend(report_path_lines)
-
-            executive_summary_path = write_executive_summary(summary_lines)
-            print()
-            print(f"Summary written to: {executive_summary_path}")
+        if not results["success"]:
+            print(results["message"])
 
         else:
-            print("No valid rows found. Revenue reports were not generated.")
+            for line in results["summary_lines"]:
+                print(line)
+
+            print()
+            print(f"Executive summary written to: {results['executive_summary_path']}")
 
     except FileNotFoundError as error:
         print(f"Error: Could not find file: {error.filename}")
