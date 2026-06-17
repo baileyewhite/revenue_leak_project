@@ -47,6 +47,174 @@ def display_download_button(file_path, label, file_name):
                 file_name=file_name,
             )
 
+CATEGORY_LABELS = {
+    "balances_overdue_past_60_days": "Patient balances overdue 60 days",
+    "balances_over_1000": "Balances over $1,000",
+    "denied_insurance_claims": "Denied insurance claims",
+    "old_submitted_claims": "Old submitted claims",
+    "pending_insurance_claims": "Pending insurance claims",
+    "unresolved_appealed_claims": "Unresolved appealed claims",
+}
+
+
+def get_unique_claims_df(combined_df):
+    if "patient_id" in combined_df.columns and "claim_id" in combined_df.columns:
+        return combined_df.drop_duplicates(
+            subset=["patient_id", "claim_id"]
+        ).copy()
+
+    return combined_df.copy()
+
+
+def prepare_chart_dataframe(combined_df):
+    chart_df = combined_df.copy()
+
+    money_columns = [
+        "patient_balance",
+        "insurance_balance",
+        "total_balance",
+    ]
+
+    for column in money_columns:
+        if column in chart_df.columns:
+            chart_df[column] = pd.to_numeric(
+                chart_df[column],
+                errors="coerce"
+            ).fillna(0)
+
+    return chart_df
+
+
+def render_dashboard_charts(combined_df):
+    chart_df = prepare_chart_dataframe(combined_df)
+    unique_claims_df = get_unique_claims_df(chart_df)
+
+    st.subheader("Revenue Leak Charts")
+
+    st.caption(
+        "Charts are based on the combined revenue leak report. "
+        "Category totals may overlap because one claim can appear in multiple categories."
+    )
+
+    chart_col1, chart_col2 = st.columns(2)
+
+    with chart_col1:
+        st.markdown("#### Unique claims by risk level")
+
+        if "risk_level" in unique_claims_df.columns:
+            risk_summary = (
+                unique_claims_df["risk_level"]
+                .fillna("unknown")
+                .astype(str)
+                .str.title()
+                .value_counts()
+                .rename_axis("Risk level")
+                .reset_index(name="Claim count")
+            )
+
+            st.bar_chart(
+                risk_summary,
+                x="Risk level",
+                y="Claim count",
+                use_container_width=True
+            )
+        else:
+            st.info("Risk level data is not available.")
+
+    with chart_col2:
+        st.markdown("#### Revenue at risk by category")
+
+        if "category_type" in chart_df.columns and "total_balance" in chart_df.columns:
+            category_summary = (
+                chart_df
+                .assign(
+                    category_label=chart_df["category_type"].map(CATEGORY_LABELS).fillna(
+                        chart_df["category_type"]
+                    )
+                )
+                .groupby("category_label", as_index=False)["total_balance"]
+                .sum()
+                .sort_values("total_balance", ascending=False)
+                .rename(columns={
+                    "category_label": "Category",
+                    "total_balance": "Revenue at risk"
+                })
+            )
+
+            st.bar_chart(
+                category_summary,
+                x="Category",
+                y="Revenue at risk",
+                use_container_width=True
+            )
+        else:
+            st.info("Category revenue data is not available.")
+
+    chart_col3, chart_col4 = st.columns(2)
+
+    with chart_col3:
+        st.markdown("#### Top payers by denied insurance balance")
+
+        if (
+            "payer" in chart_df.columns
+            and "insurance_balance" in chart_df.columns
+            and "category_type" in chart_df.columns
+        ):
+            denied_df = chart_df[
+                chart_df["category_type"] == "denied_insurance_claims"
+            ]
+
+            payer_summary = (
+                denied_df
+                .groupby("payer", as_index=False)["insurance_balance"]
+                .sum()
+                .sort_values("insurance_balance", ascending=False)
+                .head(10)
+                .rename(columns={
+                    "payer": "Payer",
+                    "insurance_balance": "Denied insurance balance"
+                })
+            )
+
+            if not payer_summary.empty:
+                st.bar_chart(
+                    payer_summary,
+                    x="Payer",
+                    y="Denied insurance balance",
+                    use_container_width=True
+                )
+            else:
+                st.info("No denied insurance payer data is available.")
+        else:
+            st.info("Payer or denied insurance balance data is not available.")
+
+    with chart_col4:
+        st.markdown("#### Top providers by revenue at risk")
+
+        if "provider" in unique_claims_df.columns and "total_balance" in unique_claims_df.columns:
+            provider_summary = (
+                unique_claims_df
+                .groupby("provider", as_index=False)["total_balance"]
+                .sum()
+                .sort_values("total_balance", ascending=False)
+                .head(10)
+                .rename(columns={
+                    "provider": "Provider",
+                    "total_balance": "Revenue at risk"
+                })
+            )
+
+            if not provider_summary.empty:
+                st.bar_chart(
+                    provider_summary,
+                    x="Provider",
+                    y="Revenue at risk",
+                    use_container_width=True
+                )
+            else:
+                st.info("No provider data is available.")
+        else:
+            st.info("Provider revenue data is not available.")
 
 st.set_page_config(
     page_title="Revenue Leak Detector",
@@ -195,6 +363,7 @@ if results is not None:
         [
             "Executive Summary",
             "Combined Report",
+            "Charts",
             "Validation",
             "Downloads"
         ],
@@ -354,6 +523,15 @@ if results is not None:
                 mime="text/csv"
             )
 
+        else:
+            st.warning("Combined report was not found.")
+
+    elif selected_view == "Charts":
+        combined_report_path = results["combined_report_path"]
+
+        if combined_report_path.exists():
+            combined_df = pd.read_csv(combined_report_path)
+            render_dashboard_charts(combined_df)
         else:
             st.warning("Combined report was not found.")
 

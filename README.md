@@ -54,6 +54,7 @@ The dashboard allows a user to:
 - Review validation warnings
 - Download the executive summary and combined report
 - Filter the combined report by risk level, claim status, category, payer, provider, balance range, and search text
+- View dashboard charts for risk levels, revenue leak categories, payers, and providers
 
 The dashboard runs locally and does not upload data to a cloud service.
 
@@ -78,6 +79,10 @@ Then upload a CSV file through the browser interface.
 ### Combined report preview
 
 ![Combined report preview](docs/images/combined_report_preview.png)
+
+### Dashboard charts
+
+![Combined report preview](docs/images/dashboard_charts.png)
 
 ## Flexible Column Mapping
 
