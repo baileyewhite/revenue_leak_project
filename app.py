@@ -18,6 +18,15 @@ from report_writer import write_executive_summary, write_run_metadata, write_val
 UPLOAD_DIR = BASE_DIR / "output" / "dashboard_uploads"
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
+SAMPLE_INPUT_PATH = BASE_DIR / "data" / "sample_dental_claims.csv"
+SAMPLE_COMPARE_PATH = BASE_DIR / "data" / "sample_dental_claims_2.csv"
+
+INPUT_SAMPLE = "Use included sample data"
+INPUT_UPLOAD = "Upload my own CSV"
+
+COMPARE_NONE = "No comparison file"
+COMPARE_SAMPLE = "Use included comparison sample"
+COMPARE_UPLOAD = "Upload comparison CSV"
 
 def save_uploaded_file(uploaded_file, file_name):
     file_path = UPLOAD_DIR / file_name
@@ -244,17 +253,48 @@ if "analysis_results" not in st.session_state:
 with st.sidebar:
     st.header("Run Settings")
 
-    uploaded_file = st.file_uploader(
-        "Upload input CSV",
-        type=["csv"],
-        key="input_file"
+    input_source = st.radio(
+        "Input source",
+        [
+            INPUT_SAMPLE,
+            INPUT_UPLOAD,
+        ],
+        key="input_source"
     )
 
-    compare_file = st.file_uploader(
-        "Optional: upload comparison CSV",
-        type=["csv"],
-        key="compare_file"
+    uploaded_file = None
+
+    if input_source == INPUT_UPLOAD:
+        uploaded_file = st.file_uploader(
+            "Upload input CSV",
+            type=["csv"],
+            key="input_file"
+        )
+    else:
+        st.info("Using included sample file: data/sample_dental_claims.csv")
+
+    st.divider()
+
+    compare_source = st.radio(
+        "Comparison source",
+        [
+            COMPARE_NONE,
+            COMPARE_SAMPLE,
+            COMPARE_UPLOAD,
+        ],
+        key="compare_source"
     )
+
+    compare_file = None
+
+    if compare_source == COMPARE_UPLOAD:
+        compare_file = st.file_uploader(
+            "Upload comparison CSV",
+            type=["csv"],
+            key="compare_file"
+        )
+    elif compare_source == COMPARE_SAMPLE:
+        st.info("Using included comparison file: data/sample_dental_claims_2.csv")
 
     deidentify = st.checkbox(
         "Mask patient and claim identifiers",
@@ -263,12 +303,27 @@ with st.sidebar:
 
     run_analysis = st.button("Run Analysis")
 
+input_ready = (
+    input_source == INPUT_SAMPLE
+    or uploaded_file is not None
+)
 
-if not uploaded_file:
-    st.info("Upload an input CSV file in the sidebar to begin.")
+compare_ready = (
+    compare_source != COMPARE_UPLOAD
+    or compare_file is not None
+)
+
+if not input_ready:
+    st.info("Choose the included sample data or upload an input CSV file to begin.")
+
+elif not compare_ready:
+    st.info("Upload a comparison CSV file or choose a different comparison option.")
 
 elif run_analysis:
-    input_path = save_uploaded_file(uploaded_file, "dashboard_input.csv")
+    if input_source == INPUT_SAMPLE:
+        input_path = SAMPLE_INPUT_PATH
+    else:
+        input_path = save_uploaded_file(uploaded_file, "dashboard_input.csv")
 
     patient_data, validation_errors = read_csv_patient_data(input_path)
 
@@ -276,8 +331,13 @@ elif run_analysis:
     compare_validation_errors = []
     comparison_lines = []
 
-    if compare_file:
+    if compare_source == COMPARE_SAMPLE:
+        compare_path = SAMPLE_COMPARE_PATH
+
+    elif compare_source == COMPARE_UPLOAD:
         compare_path = save_uploaded_file(compare_file, "dashboard_compare.csv")
+
+    if compare_path is not None:
         compare_data, compare_validation_errors = read_csv_patient_data(compare_path)
 
         comparison_lines = generate_report_comparison(
@@ -299,14 +359,6 @@ elif run_analysis:
             validation_errors,
             input_path=input_path
         )
-
-        all_validation_errors = validation_errors + compare_validation_errors
-
-        validation_errors_path = None
-
-        if all_validation_errors:
-            validation_errors_path = write_validation_errors_to_csv(all_validation_errors)
-            output_paths.append(validation_errors_path)
 
         breakdown_lines = breakdown_summary(patient_data)
         summary_lines.extend(breakdown_lines)
@@ -365,7 +417,7 @@ elif run_analysis:
             "total_claims_flagged": total_claims_flagged,
             "total_revenue_at_risk": total_revenue_at_risk,
             "total_validation_errors": total_validation_errors,
-            "has_compare_file": compare_file is not None,
+            "has_compare_file": compare_path is not None,
         }
 
         st.success("Analysis complete.")

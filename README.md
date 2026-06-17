@@ -47,6 +47,7 @@ The dashboard allows a user to:
 
 - Upload an input dental claims CSV
 - Optionally upload a comparison CSV for trend reporting
+- Run the analysis using included sample data or uploaded CSV files
 - Enable identifier masking mode with a checkbox
 - View summary metric cards
 - View the executive summary
