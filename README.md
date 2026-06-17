@@ -168,6 +168,7 @@ revenue_leak_project/
     deidentification.py
     leak_categories.py
     main.py
+    path_utils.py
     report_writer.py
     summary.py
     trend_comparison.py
@@ -179,6 +180,7 @@ revenue_leak_project/
     test_deidentification.py
     test_full_workflow.py
     test_leak_categories.py
+    test_path_utils.py
     test_summary.py
     test_trend_comparison.py
     test_workflow.py

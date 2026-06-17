@@ -2,7 +2,7 @@ from config import OUTPUT_DIR
 from action_recommendations import get_recommended_action, get_priority_reason
 import csv
 import json
-from datetime import datetime
+from path_utils import safe_output_path
 
 def write_report_to_csv(report, category_type):
     # Generates a CSV report of the list of patients and their info that applied to category
@@ -19,7 +19,7 @@ def write_report_to_csv(report, category_type):
         "Risk Level"]
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    output_path = OUTPUT_DIR / f"{category_type}.csv"
+    output_path = safe_output_path(f"{category_type}.csv")
 
     with open(output_path, 'w', newline='', encoding = "utf-8") as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=headers)
@@ -30,8 +30,8 @@ def write_report_to_csv(report, category_type):
                 writer.writerow({
                     "Patient ID": patient_id,
                     "Claim ID": claim_id,
-                    "Provider": claim_info['provider'],
-                    "Payer": claim_info['payer'],
+                    "Provider": claim_info.get("provider", ""),
+                    "Payer": claim_info.get("payer", ""),
                     "Patient Balance": claim_info['patient_balance'],
                     "Insurance Balance": claim_info['insurance_balance'],
                     "Total Balance": claim_info['total_balance'],
@@ -44,7 +44,7 @@ def write_report_to_csv(report, category_type):
 def write_combined_report_to_csv(reports_by_category):
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    output_path = OUTPUT_DIR / "combined_revenue_leak_report.csv"
+    output_path = safe_output_path("combined_revenue_leak_report.csv")
 
     fieldnames = [
         "category_type",
@@ -103,7 +103,7 @@ def write_validation_errors_to_csv(validation_errors):
         "message",]
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    output_path = OUTPUT_DIR / f"validation_errors.csv"
+    output_path = safe_output_path("validation_errors.csv")
 
     with open(output_path, 'w', newline='', encoding="utf-8") as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=headers)
@@ -114,7 +114,7 @@ def write_validation_errors_to_csv(validation_errors):
 
 def write_executive_summary(summary_lines):
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    output_path = OUTPUT_DIR / f"executive_summary.txt"
+    output_path = safe_output_path("executive_summary.txt")
 
     with open(output_path, 'w', encoding="utf-8") as file:
         for line in summary_lines:
@@ -125,7 +125,7 @@ def write_executive_summary(summary_lines):
 def write_run_metadata(metadata):
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    output_path = OUTPUT_DIR / "run_metadata.json"
+    output_path = safe_output_path("run_metadata.json")
 
     with open(output_path, "w", encoding="utf-8") as file:
         json.dump(metadata, file, indent=2, default=str)

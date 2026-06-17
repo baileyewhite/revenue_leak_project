@@ -7,6 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent
 SRC_DIR = BASE_DIR / "src"
 sys.path.append(str(SRC_DIR))
 
+from path_utils import ensure_path_inside_directory
 from workflow import run_revenue_leak_analysis
 
 UPLOAD_DIR = BASE_DIR / "output" / "dashboard_uploads"
@@ -23,7 +24,10 @@ COMPARE_SAMPLE = "Use included comparison sample"
 COMPARE_UPLOAD = "Upload comparison CSV"
 
 def save_uploaded_file(uploaded_file, file_name):
-    file_path = UPLOAD_DIR / file_name
+    safe_file_name = Path(file_name).name
+    file_path = UPLOAD_DIR / safe_file_name
+
+    file_path = ensure_path_inside_directory(file_path, UPLOAD_DIR)
 
     with open(file_path, "wb") as file:
         file.write(uploaded_file.getbuffer())

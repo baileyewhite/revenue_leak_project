@@ -1,6 +1,6 @@
 from config import BASE_DIR, DEFAULT_RUN_CONFIG_PATH
 from workflow import run_revenue_leak_analysis
-from pathlib import Path
+from path_utils import resolve_input_csv_path
 import argparse
 import json
 
@@ -40,16 +40,15 @@ def load_run_config(config_path):
     with open(config_path, "r", encoding="utf-8") as json_file:
         config = json.load(json_file)
 
-    input_file = BASE_DIR / config["input_file"]
-
-    if input_file.is_dir():
-        raise ValueError(f"Input path points to a folder, not a CSV file: {input_file}")
+    input_file = resolve_input_csv_path(config["input_file"])
 
     deidentify = config.get("deidentify", False)
+
     compare_file = config.get("compare_file")
     compare_path = None
+
     if compare_file:
-        compare_path = BASE_DIR / compare_file
+        compare_path = resolve_input_csv_path(compare_file)
 
     return input_file, deidentify, compare_path
 
@@ -60,16 +59,10 @@ if __name__ == '__main__':
         input_path, deidentify, compare_path = load_run_config(args.config)
 
         if args.input:
-            input_path = Path(args.input)
-
-            if not input_path.is_absolute():
-                input_path = BASE_DIR / input_path
+            input_path = resolve_input_csv_path(args.input)
 
         if args.compare:
-            compare_path = Path(args.compare)
-
-            if not compare_path.is_absolute():
-                compare_path = BASE_DIR / compare_path
+            compare_path = resolve_input_csv_path(args.compare)
 
         if args.deidentify:
             deidentify = True

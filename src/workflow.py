@@ -3,6 +3,7 @@ from pathlib import Path
 
 from config import BASE_DIR, OUTPUT_DIR
 from data_loader import read_csv_patient_data
+from path_utils import resolve_input_csv_path
 from summary import (
     total_summary,
     report_paths_summary,
@@ -45,12 +46,7 @@ def normalize_path(path):
     if path is None:
         return None
 
-    path = Path(path)
-
-    if path.is_absolute():
-        return path
-
-    return BASE_DIR / path
+    return resolve_input_csv_path(path)
 
 
 def build_run_metadata(
