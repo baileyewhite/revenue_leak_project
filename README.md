@@ -376,6 +376,14 @@ The CSV files in the `data/` folder are AI-generated synthetic sample files crea
 
 They do not contain real patient information, real claim records, or real insurance data. This project should only be used with synthetic, sample, or properly masked data.
 
+## False Positive Notice
+
+This tool identifies possible revenue leak candidates based on claim status, balances, days past service, and configurable rule thresholds.
+
+A flagged claim is not guaranteed to represent an actual revenue leak. Some claims may have valid business explanations, such as payment plans, recent payer activity, internal holds, corrected claims in progress, or data that is incomplete or outdated.
+
+The output should be reviewed by a qualified user before any operational, billing, or financial decisions are made.
+
 ## Important Notes
 - This project uses fake sample patient data for current testing. Real patient data should not be committed to Git.
 - `user_config/run_config.json` should point to synthetic, sample, or masked data only.

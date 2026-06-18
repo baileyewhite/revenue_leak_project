@@ -152,7 +152,7 @@ def total_summary(data, validation_errors, input_path=None, rules=None):
     add_line(f"Total unique claims flagged: {unique_claim_count}")
     add_line(f"Total unique revenue at risk: ${unique_total_revenue_risk:,.2f}")
     add_line()
-    add_line("Note: Category totals may overlap because one claim can be flagged in multiple categories. Unique revenue at risk removes duplicate claims.")
+    add_line("Note: Flagged claims are potential follow-up candidates, not confirmed revenue leaks. Review claim context before making billing, operational, or financial decisions.")
     for line in key_takeaways_summary(unique_claim_count, unique_total_revenue_risk):
         add_line(line)
 
