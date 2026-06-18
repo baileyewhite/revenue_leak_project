@@ -227,6 +227,75 @@ def render_dashboard_charts(combined_df):
         else:
             st.info("Provider revenue data is not available.")
 
+RISK_SCORE = {
+    "critical": 4,
+    "high": 3,
+    "medium": 2,
+    "low": 1,
+}
+
+
+def build_action_worklist(combined_df):
+    worklist_df = combined_df.copy()
+
+    if "patient_id" not in worklist_df.columns or "claim_id" not in worklist_df.columns:
+        return pd.DataFrame()
+
+    if "total_balance" in worklist_df.columns:
+        worklist_df["total_balance"] = pd.to_numeric(
+            worklist_df["total_balance"],
+            errors="coerce"
+        ).fillna(0)
+
+    if "days_past" in worklist_df.columns:
+        worklist_df["days_past"] = pd.to_numeric(
+            worklist_df["days_past"],
+            errors="coerce"
+        ).fillna(0)
+
+    if "risk_level" in worklist_df.columns:
+        worklist_df["risk_level_normalized"] = (
+            worklist_df["risk_level"]
+            .fillna("")
+            .astype(str)
+            .str.lower()
+        )
+
+        worklist_df["risk_score"] = worklist_df["risk_level_normalized"].map(
+            RISK_SCORE
+        ).fillna(0)
+    else:
+        worklist_df["risk_score"] = 0
+
+    sort_columns = [
+        "risk_score",
+        "total_balance",
+        "days_past",
+    ]
+
+    existing_sort_columns = [
+        column
+        for column in sort_columns
+        if column in worklist_df.columns
+    ]
+
+    worklist_df = worklist_df.sort_values(
+        existing_sort_columns,
+        ascending=False
+    )
+
+    worklist_df = worklist_df.drop_duplicates(
+        subset=["patient_id", "claim_id"],
+        keep="first"
+    )
+
+    if "category_type" in worklist_df.columns:
+        worklist_df["category"] = worklist_df["category_type"].map(
+            CATEGORY_LABELS
+        ).fillna(worklist_df["category_type"])
+
+    return worklist_df
+
 st.set_page_config(
     page_title="Revenue Leak Detector",
     layout="wide"
@@ -397,8 +466,6 @@ elif run_analysis:
         input_path = save_uploaded_file(uploaded_file, "dashboard_input.csv")
 
     compare_path = None
-    #compare_validation_errors = []
-    #comparison_lines = []
 
     if compare_source == COMPARE_SAMPLE:
         compare_path = SAMPLE_COMPARE_PATH
@@ -448,6 +515,7 @@ if results is not None:
             "Executive Summary",
             "Combined Report",
             "Charts",
+            "Action Worklist",
             "Validation",
             "Downloads"
         ],
@@ -616,6 +684,163 @@ if results is not None:
         if combined_report_path.exists():
             combined_df = pd.read_csv(combined_report_path)
             render_dashboard_charts(combined_df)
+        else:
+            st.warning("Combined report was not found.")
+
+    elif selected_view == "Action Worklist":
+        st.subheader("Action Worklist")
+
+        combined_report_path = results["combined_report_path"]
+
+        if combined_report_path.exists():
+            combined_df = pd.read_csv(combined_report_path)
+            action_df = build_action_worklist(combined_df)
+
+            if action_df.empty:
+                st.info("No action worklist rows are available.")
+            else:
+                st.caption(
+                    "This worklist deduplicates claims from the combined report and sorts them by risk, balance, and days past service."
+                )
+
+                metric_col1, metric_col2, metric_col3 = st.columns(3)
+
+                critical_high_count = 0
+
+                if "risk_level_normalized" in action_df.columns:
+                    critical_high_count = len(
+                        action_df[
+                            action_df["risk_level_normalized"].isin(["critical", "high"])
+                        ]
+                    )
+
+                total_action_balance = 0
+
+                if "total_balance" in action_df.columns:
+                    total_action_balance = action_df["total_balance"].sum()
+
+                metric_col1.metric("Unique Claims", len(action_df))
+                metric_col2.metric("Critical / High Risk", critical_high_count)
+                metric_col3.metric("Total Balance", f"${total_action_balance:,.2f}")
+
+                filtered_action_df = action_df.copy()
+
+                st.markdown("### Filters")
+
+                filter_col1, filter_col2, filter_col3 = st.columns(3)
+
+                with filter_col1:
+                    if "risk_level" in filtered_action_df.columns:
+                        selected_risks = st.multiselect(
+                            "Risk level",
+                            sorted(filtered_action_df["risk_level"].dropna().astype(str).unique()),
+                            key="action_worklist_risk_filter"
+                        )
+
+                        if selected_risks:
+                            filtered_action_df = filtered_action_df[
+                                filtered_action_df["risk_level"].astype(str).isin(selected_risks)
+                            ]
+
+                with filter_col2:
+                    if "recommended_action" in filtered_action_df.columns:
+                        selected_actions = st.multiselect(
+                            "Recommended action",
+                            sorted(filtered_action_df["recommended_action"].dropna().astype(str).unique()),
+                            key="action_worklist_action_filter"
+                        )
+
+                        if selected_actions:
+                            filtered_action_df = filtered_action_df[
+                                filtered_action_df["recommended_action"].astype(str).isin(selected_actions)
+                            ]
+
+                with filter_col3:
+                    if "payer" in filtered_action_df.columns:
+                        selected_payers = st.multiselect(
+                            "Payer",
+                            sorted(filtered_action_df["payer"].dropna().astype(str).unique()),
+                            key="action_worklist_payer_filter"
+                        )
+
+                        if selected_payers:
+                            filtered_action_df = filtered_action_df[
+                                filtered_action_df["payer"].astype(str).isin(selected_payers)
+                            ]
+
+                search_text = st.text_input(
+                    "Search action worklist",
+                    placeholder="Search claim ID, payer, provider, action, or reason...",
+                    key="action_worklist_search"
+                )
+
+                if search_text:
+                    searchable_columns = [
+                        "patient_id",
+                        "claim_id",
+                        "payer",
+                        "provider",
+                        "category",
+                        "recommended_action",
+                        "priority_reason",
+                    ]
+
+                    existing_searchable_columns = [
+                        column
+                        for column in searchable_columns
+                        if column in filtered_action_df.columns
+                    ]
+
+                    search_mask = filtered_action_df[existing_searchable_columns].astype(str).apply(
+                        lambda row: row.str.contains(
+                            search_text,
+                            case=False,
+                            na=False
+                        ).any(),
+                        axis=1
+                    )
+
+                    filtered_action_df = filtered_action_df[search_mask]
+
+                display_columns = [
+                    "risk_level",
+                    "claim_id",
+                    "patient_id",
+                    "payer",
+                    "provider",
+                    "category",
+                    "days_past",
+                    "total_balance",
+                    "recommended_action",
+                    "priority_reason",
+                ]
+
+                existing_display_columns = [
+                    column
+                    for column in display_columns
+                    if column in filtered_action_df.columns
+                ]
+
+                display_df = filtered_action_df[existing_display_columns].copy()
+
+                st.markdown("### Priority Claims")
+
+                st.caption(
+                    f"Showing {len(display_df)} of {len(action_df)} unique claim(s)."
+                )
+
+                st.dataframe(display_df, use_container_width=True)
+
+                action_csv = display_df.to_csv(index=False).encode("utf-8")
+
+                st.download_button(
+                    label="Download Action Worklist",
+                    data=action_csv,
+                    file_name="action_worklist.csv",
+                    mime="text/csv",
+                    key="download_action_worklist"
+                )
+
         else:
             st.warning("Combined report was not found.")
 

@@ -110,7 +110,7 @@ REPORT_CATEGORIES = [
     },
     {
         "category_type": "balances_over_1000",
-        "statement": "Outstanding total balances over ${large_balance_threshold}",
+        "statement": "Outstanding total balances over ${large_balance_threshold:,.2f}",
         "balance_field": "total_balance",
         "finder": find_large_balances
     },

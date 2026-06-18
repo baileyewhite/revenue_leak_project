@@ -33,6 +33,7 @@ Revenue Leak Detector is designed to help identify dental claims and patient bal
   - List of reports created
   - A comparison trend summary when run with the `--compare` command
   - A breakdown summary highlighting top payers, top providers, and top procedures
+  - A plan that highlights top priority actions based on the highest risk claims
 - Supports optional identifier masking mode to mask patient and claim identifiers in generated reports
 - Supports flexible column mapping for alternate CSV header names
 - Provides user-friendly error handling for missing files, missing columns, invalid dates, and invalid money values
@@ -108,6 +109,12 @@ Currently, the breakdown summary shows the top payer by denied insurance balance
 
 The breakdown summary is a useful tool for providing management insight and answering business questions.
 
+## Recommended Action Plan
+
+The recommended action plan reviews unique flagged claims, groups them by risk level, and highlights the claims that should be worked first.
+
+It shows the most common recommended action, the largest single claim at risk, and the top 5 priority claims. This helps turn the analysis from a static report into a practical follow-up worklist.
+
 ## Validation Report
 
 If the input CSV contains invalid rows, the script creates a `validation_errors.csv` file in the `output/` folder.
@@ -162,6 +169,7 @@ revenue_leak_project/
   output/
     generated report files
   src/
+    action_plan.py
     action_recommendations.py
     breakdowns.py
     config.py

@@ -12,6 +12,7 @@ from summary import (
 from breakdowns import breakdown_summary
 from trend_comparison import generate_report_comparison
 from deidentification import deidentify_patient_data
+from action_plan import generate_action_plan
 from report_writer import (
     write_executive_summary,
     write_run_metadata,
@@ -123,6 +124,11 @@ def run_revenue_leak_analysis(
         input_path=input_path,
         rules=rules
     )
+
+    combined_report_path = OUTPUT_DIR / "combined_revenue_leak_report.csv"
+
+    action_plan_lines = generate_action_plan(combined_report_path)
+    summary_lines.extend(action_plan_lines)
 
     breakdown_lines = breakdown_summary(patient_data)
     summary_lines.extend(breakdown_lines)
