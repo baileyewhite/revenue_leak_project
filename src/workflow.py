@@ -1,9 +1,9 @@
 from datetime import date
-from pathlib import Path
 
 from config import BASE_DIR, OUTPUT_DIR
 from data_loader import read_csv_patient_data
 from path_utils import resolve_input_csv_path
+from rules import merge_rules
 from summary import (
     total_summary,
     report_paths_summary,
@@ -57,6 +57,7 @@ def build_run_metadata(
     compare_validation_errors,
     mask_identifiers,
     output_paths,
+    rules
 ):
     all_validation_errors = validation_errors + compare_validation_errors
 
@@ -72,6 +73,7 @@ def build_run_metadata(
         "invalid_rows_skipped": count_invalid_rows(all_validation_errors),
         "validation_errors": len(all_validation_errors),
         "identifier_masking_enabled": mask_identifiers,
+        "rules_used": rules,
         "reports_created": len(output_paths) + 2,
     }
 
@@ -80,7 +82,10 @@ def run_revenue_leak_analysis(
     input_path,
     compare_path=None,
     mask_identifiers=False,
+    rules=None
 ):
+    rules = merge_rules(rules)
+
     input_path = normalize_path(input_path)
     compare_path = normalize_path(compare_path)
 
@@ -116,6 +121,7 @@ def run_revenue_leak_analysis(
         patient_data,
         validation_errors,
         input_path=input_path,
+        rules=rules
     )
 
     breakdown_lines = breakdown_summary(patient_data)
@@ -140,6 +146,7 @@ def run_revenue_leak_analysis(
         compare_validation_errors=compare_validation_errors,
         mask_identifiers=mask_identifiers,
         output_paths=output_paths,
+        rules=rules
     )
 
     metadata_path = write_run_metadata(metadata)

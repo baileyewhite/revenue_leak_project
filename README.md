@@ -49,6 +49,7 @@ The dashboard allows a user to:
 - Optionally upload a comparison CSV for trend reporting
 - Run the analysis using included sample data or uploaded CSV files
 - Enable identifier masking mode with a checkbox
+- Adjust rule thresholds for overdue balances, large balances, aging claims, and risk scoring before running the analysis
 - View summary metric cards
 - View the executive summary
 - Preview the combined revenue leak report
@@ -170,6 +171,7 @@ revenue_leak_project/
     main.py
     path_utils.py
     report_writer.py
+    rules.py
     summary.py
     trend_comparison.py
     workflow.py

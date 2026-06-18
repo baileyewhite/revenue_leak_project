@@ -39,7 +39,7 @@ def generate_report_comparison(input_report, compare_report, compare_path):
             resolved_claims.append(claim_key)
             risk_decrease += claim_info['total_balance']
 
-    net_risk_exposure = risk_increase + risk_decrease
+    net_risk_exposure = risk_increase - risk_decrease
 
     add_line()
     add_line("Trend Comparison Summary")

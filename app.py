@@ -289,6 +289,89 @@ with st.sidebar:
         value=False
     )
 
+    with st.expander("Rule Settings"):
+        patient_overdue_days = st.number_input(
+            "Patient balance overdue days",
+            min_value=1,
+            max_value=365,
+            value=60,
+            step=1,
+        )
+
+        large_balance_threshold = st.number_input(
+            "Large balance threshold",
+            min_value=0.0,
+            max_value=100000.0,
+            value=1000.0,
+            step=50.0,
+        )
+
+        old_submitted_days = st.number_input(
+            "Old submitted claim days",
+            min_value=1,
+            max_value=365,
+            value=60,
+            step=1,
+        )
+
+        pending_insurance_days = st.number_input(
+            "Pending insurance claim days",
+            min_value=1,
+            max_value=365,
+            value=60,
+            step=1,
+        )
+
+        st.markdown("#### Risk Scoring")
+
+        medium_balance_threshold = st.number_input(
+            "Medium risk balance threshold",
+            min_value=0.0,
+            max_value=100000.0,
+            value=750.0,
+            step=50.0,
+        )
+
+        high_balance_threshold = st.number_input(
+            "High risk balance threshold",
+            min_value=0.0,
+            max_value=100000.0,
+            value=1500.0,
+            step=50.0,
+        )
+
+        critical_balance_threshold = st.number_input(
+            "Critical risk balance threshold",
+            min_value=0.0,
+            max_value=100000.0,
+            value=3000.0,
+            step=50.0,
+        )
+
+        medium_days_past = st.number_input(
+            "Medium risk days past service",
+            min_value=1,
+            max_value=365,
+            value=90,
+            step=1,
+        )
+
+        high_days_past = st.number_input(
+            "High risk days past service",
+            min_value=1,
+            max_value=365,
+            value=180,
+            step=1,
+        )
+
+        critical_days_past = st.number_input(
+            "Critical risk days past service",
+            min_value=1,
+            max_value=365,
+            value=240,
+            step=1,
+        )
+
     run_analysis = st.button("Run Analysis")
 
 input_ready = (
@@ -323,10 +406,24 @@ elif run_analysis:
     elif compare_source == COMPARE_UPLOAD:
         compare_path = save_uploaded_file(compare_file, "dashboard_compare.csv")
 
+    dashboard_rules = {
+        "patient_overdue_days": patient_overdue_days,
+        "large_balance_threshold": large_balance_threshold,
+        "old_submitted_days": old_submitted_days,
+        "pending_insurance_days": pending_insurance_days,
+        "medium_balance_threshold": medium_balance_threshold,
+        "medium_days_past": medium_days_past,
+        "high_balance_threshold": high_balance_threshold,
+        "high_days_past": high_days_past,
+        "critical_balance_threshold": critical_balance_threshold,
+        "critical_days_past": critical_days_past,
+    }
+
     results = run_revenue_leak_analysis(
         input_path=input_path,
         compare_path=compare_path,
         mask_identifiers=deidentify,
+        rules=dashboard_rules,
     )
 
     if not results["success"]:

@@ -47,14 +47,14 @@ def key_takeaways_summary(unique_claim_count, unique_total_revenue_risk):
     return lines
 
 ### MAIN GENERATOR ###
-def generate_all_reports(data):
+def generate_all_reports(data, rules=None):
     reports = []
     output_paths = []
     reports_by_category = []
     category_summary_lines = []
 
     for category in REPORT_CATEGORIES:
-        report = category["finder"](data)
+        report = category["finder"](data, rules=rules)
 
         output_path = write_report_to_csv(report, category["category_type"])
 
@@ -98,19 +98,17 @@ def category_summary(report, statement, balance_field):
         for claim_id, claim_info in claims.items():
             total_owed += claim_info[balance_field]
 
-            if claim_info['risk_level'] == "Low":
-                risk_counts['low'] += 1
-            if claim_info['risk_level'] == "Medium":
-                risk_counts['medium'] += 1
-            if claim_info['risk_level'] == "High":
-                risk_counts['high'] += 1
-            if claim_info['risk_level'] == "Critical":
-                risk_counts['critical'] += 1
+            risk = str(claim_info.get("risk_level", "")).lower()
+
+            if risk in risk_counts:
+                risk_counts[risk] += 1
 
     risk_summary = format_risk_summary(risk_counts)
-    return f"{statement}: {claim_count} claims | ${total_owed:,.2f} | {risk_summary}"
 
-def total_summary(data, validation_errors, input_path=None):
+    claim_word = "claim" if claim_count == 1 else "claims"
+    return f"{statement}: {claim_count} {claim_word} | ${total_owed:,.2f} | {risk_summary}"
+
+def total_summary(data, validation_errors, input_path=None, rules=None):
     summary_lines = []
 
     def add_line(line=""):
@@ -135,7 +133,7 @@ def total_summary(data, validation_errors, input_path=None):
         add_line(f"{total_errors} error(s) were found.")
         add_line()
 
-    unique_claim_count, unique_total_revenue_risk, output_paths, category_summary_lines = generate_all_reports(data)
+    unique_claim_count, unique_total_revenue_risk, output_paths, category_summary_lines = generate_all_reports(data, rules=rules)
 
     for line in category_summary_lines:
         add_line(line)
@@ -149,12 +147,6 @@ def total_summary(data, validation_errors, input_path=None):
     add_line("Note: Category totals may overlap because one claim can be flagged in multiple categories. Unique revenue at risk removes duplicate claims.")
     for line in key_takeaways_summary(unique_claim_count, unique_total_revenue_risk):
         add_line(line)
-    '''
-    add_line("Revenue Reports Created:")
-
-    for output_path in output_paths:
-        add_line(f"- {output_path}")
-    '''
 
     return summary_lines, output_paths
 
@@ -186,6 +178,6 @@ def format_risk_summary(risk_counts):
             parts.append(f"{count} {risk_level}")
 
     if not parts:
-        return "Risk: none"
+        return "Risk: N/A"
 
     return "Risk: " + ", ".join(parts)
