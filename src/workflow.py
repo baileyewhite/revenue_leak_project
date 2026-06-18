@@ -1,6 +1,6 @@
 from datetime import date
 
-from config import BASE_DIR, OUTPUT_DIR
+from config import OUTPUT_DIR
 from data_loader import read_csv_patient_data
 from path_utils import resolve_input_csv_path
 from rules import merge_rules

@@ -35,7 +35,7 @@ def test_generate_report_comparison_counts_new_and_resolved_claims():
     assert "Resolved claims in new file: 1" in result
     assert "Revenue at risk increased by: $900.00" in result
     assert "Revenue at risk decreased by: $300.00" in result
-    assert "Net change in revenue risk exposure: $1,200.00" in result
+    assert "Net change in revenue risk exposure: $600.00" in result
 
 def test_generate_report_comparison_when_reports_match():
     input_report = {

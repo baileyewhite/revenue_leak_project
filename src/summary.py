@@ -1,7 +1,8 @@
 from config import TODAY, BASE_DIR
 from leak_categories import REPORT_CATEGORIES
+from rules import merge_rules
 from pathlib import Path
-from report_writer import write_report_to_csv, write_combined_report_to_csv, write_validation_errors_to_csv
+from report_writer import write_report_to_csv, write_combined_report_to_csv
 
 ## HELPER FUNCTIONS ##
 def format_relative_path(path):
@@ -53,14 +54,21 @@ def generate_all_reports(data, rules=None):
     reports_by_category = []
     category_summary_lines = []
 
+    rules = merge_rules(rules)
+
     for category in REPORT_CATEGORIES:
         report = category["finder"](data, rules=rules)
+
+        statement = format_category_statement(
+            category["statement"],
+            rules
+        )
 
         output_path = write_report_to_csv(report, category["category_type"])
 
         summary_line = category_summary(
             report,
-            category["statement"],
+            statement,
             category["balance_field"]
         )
         category_summary_lines.append(summary_line)
@@ -68,7 +76,7 @@ def generate_all_reports(data, rules=None):
 
         reports_by_category.append({
             "category_type": category["category_type"],
-            "statement": category["statement"],
+            "statement": statement,
             "report": report
         })
 
@@ -181,3 +189,6 @@ def format_risk_summary(risk_counts):
         return "Risk: N/A"
 
     return "Risk: " + ", ".join(parts)
+
+def format_category_statement(statement_template, rules):
+    return statement_template.format(**rules)

@@ -1,4 +1,4 @@
-from config import MAX_LATE_BALANCE, MAX_TOTAL_BALANCE, PAST_DUE_LIMIT
+from config import MAX_LATE_BALANCE
 from rules import merge_rules
 
 def add_claim_to_report(report, patient_id, claim_id, claim_info, rules=None):
@@ -104,13 +104,13 @@ def find_appealed_claims(patient_data, rules=None):
 REPORT_CATEGORIES = [
     {
         "category_type": "balances_overdue_past_60_days",
-        "statement": "Outstanding patient balances overdue past configurable amount of days",
+        "statement": "Outstanding patient balances overdue past {patient_overdue_days} days",
         "balance_field": "patient_balance",
         "finder": find_owed_money
     },
     {
         "category_type": "balances_over_1000",
-        "statement": "Outstanding total balances over configurable threshold",
+        "statement": "Outstanding total balances over ${large_balance_threshold}",
         "balance_field": "total_balance",
         "finder": find_large_balances
     },
@@ -122,13 +122,13 @@ REPORT_CATEGORIES = [
     },
     {
         "category_type": "old_submitted_claims",
-        "statement": "Outstanding old submitted insurance claims",
+        "statement": "Outstanding submitted insurance claims older than {old_submitted_days} days",
         "balance_field": "insurance_balance",
         "finder": find_old_submitted_claims
     },
     {
         "category_type": "pending_insurance_claims",
-        "statement": "Outstanding old pending insurance claims",
+        "statement": "Outstanding pending insurance claims older than {pending_insurance_days} days",
         "balance_field": "insurance_balance",
         "finder": find_pending_insurance_claims
     },

@@ -1,4 +1,4 @@
-from config import BASE_DIR, DEFAULT_RUN_CONFIG_PATH
+from config import DEFAULT_RUN_CONFIG_PATH
 from workflow import run_revenue_leak_analysis
 from path_utils import resolve_input_csv_path
 import argparse

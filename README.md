@@ -74,9 +74,9 @@ Then upload a CSV file through the browser interface.
 
 ![Dashboard upload screen](docs/images/dashboard_upload.png)
 
-### Executive summary and metrics
+### Executive summary, configurable rules, and metrics
 
-![Dashboard summary view](docs/images/dashboard_summary.png)
+![Dashboard summary preview](docs/images/dashboard_executive_summary.png)
 
 ### Combined report preview
 
@@ -155,7 +155,7 @@ revenue_leak_project/
     images/
         combined_report_preview.png
         dashboard_charts.png
-        dashboard_summary.png
+        dashboard_executive_summary.png
         dashboard_upload.png
         downloads_tabs.png
     example_executive_summary.md
